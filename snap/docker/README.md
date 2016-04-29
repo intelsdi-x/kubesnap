@@ -25,6 +25,18 @@ To start prepared image, simply type:
 
 	$ make run
 
+by default, snap daemon starts with:
+	
+	$ snapd -t 0 -a /opt/snap/plugins
+
+if you want to override these arguments, run:
+
+	$ make run ARGS=<snapd_args>
+
+for example:
+
+	$ make run ARGS="-t 1 --tribe"
+
 ### Manage snap plugins remotely
 
 snap has REST API, which allows to manage plugins and tasks inside snap Docker container remotely. For more information, read [snap API](https://github.com/mkleina/snap/blob/master/docs/REST_API.md#plugin-api).

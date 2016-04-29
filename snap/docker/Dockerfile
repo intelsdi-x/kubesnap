@@ -22,4 +22,4 @@ RUN cp -a snap-v0.13.0-beta/plugin/snap-plugin-collector-docker /opt/snap/plugin
 
 # Start snap daemon with auto discover option
 EXPOSE 8181
-CMD ["snapd", "-t", "0", "-a", "/opt/snap/plugins"]
+ENTRYPOINT ["snapd", "-t", "0", "-a", "/opt/snap/plugins"]
