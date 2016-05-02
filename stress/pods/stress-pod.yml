@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: stress-pod
+spec:
+  containers:
+  - name: snap
+    image: 10.91.96.230:5000/stress-docker
+    args: ["-c", "1"]

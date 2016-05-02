@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: snap-daemon
+spec:
+  template:
+    metadata:
+      name: snap-daemon
+      labels:
+        daemon: snapd
+    spec:
+      hostPID: true
+      hostNetwork: true
+      containers:
+      - name: snap
+        image: 10.91.96.230:5000/snap-docker
+        args: []
+        volumeMounts:
+          - mountPath: /sys/fs/cgroup
+            name: cgroup
+          - mountPath: /var/run/docker.sock
+            name: docker-sock
+        ports:
+        - containerPort: 8181
+          hostPort: 8181
+          name: snap-api
+      volumes:
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock

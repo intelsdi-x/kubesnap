@@ -10,7 +10,8 @@ This is complete working Dockerfile for snap telemetry framework.
 ## Setup
 To simplify Docker setup, there is Makefile included. You don't need to type Docker commands each time to get it work.
 
-### Build
+#### Build
+
 To download and build working snap Docker image, launch:
 	
 	$ git clone https://github.com/intelsdi-x/kubesnap
@@ -19,7 +20,7 @@ To download and build working snap Docker image, launch:
 
 You can pass your system wide $HTTP_PROXY and $HTTPS_PROXY environment variables to proxy arguments or skip it at all.
 
-### Run
+#### Run
 
 To start prepared image, simply type:
 
@@ -37,16 +38,47 @@ for example:
 
 	$ make run ARGS="-t 1 --tribe"
 
-### Manage snap plugins remotely
+### Build & Run on CoreOS
 
-snap has REST API, which allows to manage plugins and tasks inside snap Docker container remotely. For more information, read [snap API](https://github.com/mkleina/snap/blob/master/docs/REST_API.md#plugin-api).
+There is no make tool on CoreOS, so you must build Docker image manually.
+
+#### Build
+
+	docker build --no-cache=true --build-arg http_proxy=<http_proxy_optional> --build-arg=https_proxy=<https_proxy_optional> -t snap-docker .
 
 ### Built-in plugins
+
+#### Run
+
+	docker run --rm --pid=host --net=host -v /sys/fs/cgroup:/sys/fs/cgroup -v /var/run/docker.sock:/var/run/docker.sock --name snap -p 8181:8181 snap-docker <args_optional>
+
+### Built-in plugins
+
 This Docker image includes all plugins from snap plugins pack release. By default, there is only snap-plugin-collector-docker installed. If you want more, just modify Dockerfile and rebuild image:
 
 	# Install specific plugins
 	RUN cp -a snap-v0.13.0-beta/plugin/snap-plugin-collector-docker /opt/snap/plugins
 	RUN cp -a snap-v0.13.0-beta/plugin/<plugin_to_install> /opt/snap/plugins
+
+## Attach to snap container
+
+If you need to attach to snap container and run some bash commands, type:
+
+	docker exec -it snap bash
+
+## Push Docker image to external registry
+
+If you have external server for holding your Docker images, you need to push your image to that server. Just type:
+
+	docker push <registry_ip>:<registry_port>/<docker_image_name>
+
+Now you need to provide \<registry_ip\> and \<registry_port\> when running image:
+
+	docker run --rm --pid=host --net=host -v /sys/fs/cgroup:/sys/fs/cgroup -v /var/run/docker.sock:/var/run/docker.sock --name snap -p 8181:8181 <registry_ip>:<registry_port>/snap-docker <args_optional>
+
+## Manage snap plugins remotely
+
+snap has REST API, which allows to manage plugins and tasks inside snap Docker container remotely. For more information, read [snap API](https://github.com/mkleina/snap/blob/master/docs/REST_API.md#plugin-api).
 
 ## Author
 
