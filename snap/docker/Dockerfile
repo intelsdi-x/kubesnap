@@ -1,9 +1,31 @@
 FROM ubuntu
 MAINTAINER mateusz.kleina@intel.com
 
-# Install tools
 RUN apt-get update
-RUN apt-get -y install wget
+RUN apt-get -y install wget curl make git
+
+
+ENV GOLANG_VERSION 1.6.1
+ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
+ENV GOLANG_DOWNLOAD_SHA256 6d894da8b4ad3f7f6c295db0d73ccc3646bce630e1c43e662a0120681d47e988
+
+RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
+	&& echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - \
+	&& tar -C /usr/local -xzf golang.tar.gz \
+	&& rm golang.tar.gz
+
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+
+COPY publisher/snap-plugin-collector-users /go/src/github.com/intelsdi-x/snap-plugin-collector-users
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-users
+
+ENV GOMAXPROCS=1
+RUN go get github.com/tools/godep
+RUN cd /go/src/github.com/intelsdi-x/snap-plugin-collector-users && make && mkdir -p /opt/snap/plugins && mv /go/src/github.com/intelsdi-x/snap-plugin-collector-users/build/rootfs/snap-plugin-collector-users /opt/snap/plugins
+
 
 # Download and install snap release
 RUN wget https://github.com/intelsdi-x/snap/releases/download/v0.13.0-beta/snap-v0.13.0-beta-linux-amd64.tar.gz
