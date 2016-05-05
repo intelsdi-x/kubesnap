@@ -16,15 +16,15 @@ spec:
     spec:
       containers:
       - name: influxdb
-        image: localhost/heapster_influxdb_snap:v1
+        image: 10.1.23.1:5000/influxdb-snap:1
         volumeMounts:
         - mountPath: /data
           name: influxdb-storage
       - name: grafana
-        image: localhost/heapster_grafana_snap:v1
+        image: 10.1.23.1:5000/grafana-snap:1
         env:
           - name: INFLUXDB_SERVICE_URL
-            value: http://monitoring-influxdb:8086
+            value: http://10.2.50.51:8086
             # The following env variables are required to make Grafana accessible via
             # the kubernetes api-server proxy. On production clusters, we recommend
             # removing these env variables, setup auth for grafana, and expose the grafana
