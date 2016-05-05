@@ -12,5 +12,6 @@ spec:
   - name: api
     port: 8086
     targetPort: 8086
+  clusterIP: 10.2.50.51
   selector:
     name: influxGrafana

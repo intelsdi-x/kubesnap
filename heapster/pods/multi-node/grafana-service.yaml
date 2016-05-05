@@ -13,5 +13,6 @@ spec:
   ports:
   - port: 80
     targetPort: 3000
+  clusterIP: 10.2.50.50
   selector:
     name: influxGrafana

@@ -20,9 +20,9 @@ spec:
     spec:
       containers:
       - name: heapster
-        image: localhost/heapster_snap:1
+        image: 10.1.23.1:5000/heapster-snap:1
         imagePullPolicy: Always
         command:
         - /heapster
         - --source=kubernetes.snap:https://kubernetes.default
-        - --sink=influxdb:http://monitoring-influxdb:8086
+        - --sink=influxdb:http://10.2.50.51:8086
