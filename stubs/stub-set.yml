@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: snap-stub
+spec:
+  template:
+    metadata:
+      labels:
+        name: snap-stub
+    spec:
+      hostPID: true
+      hostNetwork: true
+      containers:
+      - name: snap-stub
+        image: 10.1.23.1:5000/snap_stub:1
+        ports:
+        - containerPort: 8777
+          hostPort: 8777
+          name: snap-stub-api
