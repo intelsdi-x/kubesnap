@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  labels:
+    name: workload-rc
+  name: workload-controller
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    name: workload-rc
+  template:
+    metadata:
+      labels:
+        name: workload-rc
+    spec:
+      containers:
+      - name: workload
+        image: 10.1.23.1:5000/workload:1
+        resources:
+          requests:
+            cpu: "1000m"
