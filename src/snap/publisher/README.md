@@ -1,1 +1,1 @@
-snap publisher with embedded REST API server
+# snap publisher with embedded REST API server
