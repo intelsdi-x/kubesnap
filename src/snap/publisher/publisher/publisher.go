@@ -28,9 +28,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"encoding/json"
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/exchange"
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/server"
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/util"
+	"github.com/intelsdi-x/kubesnap/src/snap/publisher/exchange"
+	"github.com/intelsdi-x/kubesnap/src/snap/publisher/server"
+	"github.com/intelsdi-x/kubesnap/src/snap/publisher/util"
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"

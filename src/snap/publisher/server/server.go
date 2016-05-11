@@ -29,7 +29,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/exchange"
+	"github.com/intelsdi-x/kubesnap/src/snap/publisher/exchange"
 	"sync"
 )
 

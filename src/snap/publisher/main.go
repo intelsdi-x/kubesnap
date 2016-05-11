@@ -23,7 +23,7 @@ import (
 	"os"
 
 	"github.com/intelsdi-x/snap/control/plugin"
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/publisher"
+	"github.com/intelsdi-x/kubesnap/src/snap/publisher/publisher"
 )
 
 func main() {
