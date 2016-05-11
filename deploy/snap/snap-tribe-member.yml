@@ -1,11 +1,12 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: snap-daemon
+  name: snap
+  namespace: kube-system
 spec:
   template:
     metadata:
-      name: snap-daemon
+      name: snap
       labels:
         daemon: snapd
     spec:
@@ -13,8 +14,8 @@ spec:
       hostNetwork: true
       containers:
       - name: snap
-        image: 10.91.96.230:5000/snap-docker
-        args: []
+        image: 10.1.23.1:5000/snap:1
+        args: ["--tribe-seed", "10.91.97.195"]
         volumeMounts:
           - mountPath: /sys/fs/cgroup
             name: cgroup
@@ -24,6 +25,8 @@ spec:
         - containerPort: 8181
           hostPort: 8181
           name: snap-api
+      nodeSelector:
+        tribe-role: member
       volumes:
         - name: cgroup
           hostPath:

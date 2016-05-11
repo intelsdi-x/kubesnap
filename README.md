@@ -1,75 +1,112 @@
 # kubesnap
 
-## How to run (single host example)
+## How to run
 
 ### Prerequisites
 
-1. Running **Kubernetes** cluster - tested with Kubernetes 31de62216dea226f0553e698da38000b73684d49
-2. Cloned **Heapster** repo - tested with Heapster de510e4bdcdea96722b5bde19ff0b7a142939485
+- **Kubernetes** cluster - tested with Kubernetes on CoreOS
+- One minion node labeled as tribe chief:
+```
+kubectl label nodes 10.91.97.195 tribe-role=chief
+```
+- Other minion nodes labeled as tribe members:
+```
+kubectl label nodes 10.91.97.194 tribe-role=member
+```
 
 ### Steps
 
-1. Copy files from heapster directory to **Heapster** repo
+#### Building
 
-2. In **Heapster** repo build influxdb container:
+- Clone **Heapster**
 ```
-docker build --no-cache=true --build-arg http_proxy=http://<proxy_ip>:<proxy_port> --build-arg https_proxy=https://<proxy_ip>:<proxy_port> -t influx_for_snap/ver:1 .
-```
-
-3. In **Heapster** repo build grafana container:
-```
-docker build --no-cache=true --build-arg http_proxy=http://<proxy_ip>:<proxy_port> -t grafana_for_snap/ver:1 .
+git clone https://github.com/kubernetes/heapster.git
+cd heapster
+git reset --hard de510e4bdcdea96722b5bde19ff0b7a142939485
 ```
 
-4. Start influxdb-grafana-controller from **Heapster** repo
+- Clone **kubesnap**
 ```
-kubectl.sh create -f deploy/kube-config/influxdb/influxdb-grafana-controller.yaml
-```
-
-5. Start grafan Pod
-```
-kubectl.sh create -f deploy/kube-config/influxdb/grafana-service.yaml
+git clone https://github.com/intelsdi-x/kubesnap.git
 ```
 
-6. Start influxdb Pod
+- Build **Heapster** container
 ```
-kubectl.sh create -f deploy/kube-config/influxdb/influxdb-service.yaml
-```
-
-7. Export env. variables for Heapster
-```
-export KUBERNETES_SERVICE_HOST=127.0.0.1
-export KUBERNETES_SERVICE_PORT=8080
+cd kubesnap/src/heapster
+docker build -t heapster-snap .
+docker tag heapster-snap <docker_registry>/heapster-snap:1
+docker push <docker_registry>/heapster-snap:1
 ```
 
-8. Run stub server
-Go to stubs directory and follow the instructions to start snap stub server
-
-9. Build heapster from **Heapster** repo
+- Build **Influxdb** container
 ```
-make all
-```
-
-10. Run heapster from **Heapster** repo
-```
-./heapster --source=kubernetes.snap:http://127.0.0.1:8080 --sink=influxdb:http://10.0.0.15:8086
+cd heapster/influxdb
+docker build -t influxdb-snap .
+docker tag influxdb-snap <docker_registry>/influxdb-snap:1
+docker push <docker_registry>/influxdb-snap:1
 ```
 
-## APIs
+- Build **Grafana** container
+```
+cd heapster/grafana
+docker build -t grafana-snap .
+docker tag grafana-snap <docker_registry>/grafana-snap:1
+docker push <docker_registry>/grafana-snap:1
+```
 
-API | Endpoint
-----|-----
-cadvisor | localhost:4194/api/v1.3
-kubernetes | localhost:8080
-heapster | localhost:8082/api/v1/model/metrics/
-kubelet | localhost:10255/stats/container/
-summary | localhost:10255/stats/summary
-snap mock | localhost:8777/stats/container/
+- Build **snap** container
+```
+cd kubesnap/src/snap
+docker build -t snap .
+docker tag snap <docker_registry>/snap:1
+docker push <docker_registry>/snap:1
+```
 
-## GUIs
+- (Optional) Build **workload** container
+```
+cd kubesnap/src/workload
+docker build -t workload .
+docker tag workload <docker_registry>/workload:1
+docker push <docker_registry>/workload:1
+```
 
-GUI | URL
-----|-----
-cadvisor | localhost:4194
-influxdb | 10.0.0.15:8083
-grafana | 10.0.0.16
+- (Optional) Build **snap_stub** container
+```
+cd kubesnap/src/snap_stub
+docker build -t snap_stub .
+docker tag snap_stub 10.1.23.1:5000/snap_stub:1
+docker push 10.1.23.1:5000/snap_stub:1
+```
+
+#### Running
+
+- Deploy snap (or snap_stub)
+```
+cd kubesnap/deploy
+kubectl create -f snap/ OR kubectl create -f snap_stub/
+```
+
+- Deploy Heapster, InfluxDB and Grafana
+```
+cd kubesnap/deploy
+kubectl create -f heapster/multi-node/
+```
+
+- (Optional) Deploy workload
+```
+cd kubesnap/deploy
+kubectl create -f workload/
+```
+
+#### Demo with Horizontal Pod Autoscaler 
+
+- Autoscale the workload, an example:
+```
+kubectl autoscale rc workload-controller --min=1 --max=5 --cpu-percent=5 --namespace=kube-system
+```
+
+- Increase CPU utilization in workload-controller (in this example workload will use 2 CPUs):
+```
+curl -H "Content-Type: application/json" -X POST -d '{"load":2}' http://10.2.50.52:7777/set_load
+curl http://10.2.50.52:7777/load (to check current load)
+```
