@@ -20,6 +20,8 @@ spec:
         resources:
           requests:
             cpu: "1000m"
+          limits:
+            cpu: "5000m"
         ports:
         - name: api
           containerPort: 7777
