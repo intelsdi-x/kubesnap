@@ -24,8 +24,7 @@ WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-users
 
 ENV GOMAXPROCS=1
 RUN go get github.com/tools/godep
-RUN cd /go/src/github.com/intelsdi-x/snap-plugin-collector-users && make && mkdir -p /opt/snap/plugins && mv /go/src/github.com/intelsdi-x/snap-plugin-collector-users/build/rootfs/snap-plugin-collector-users /opt/snap/plugins
-
+RUN cd /go/src/github.com/intelsdi-x/snap-plugin-collector-users && make
 
 # Download and install snap release
 RUN wget https://github.com/intelsdi-x/snap/releases/download/v0.13.0-beta/snap-v0.13.0-beta-linux-amd64.tar.gz
@@ -41,6 +40,7 @@ RUN tar -zxf snap-plugins-v0.13.0-beta-linux-amd64.tar.gz
 
 # Install specific plugins
 RUN cp -a snap-v0.13.0-beta/plugin/snap-plugin-collector-docker /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-users/build/rootfs/snap-plugin-collector-users /opt/snap/plugins
 
 # Start snap daemon with auto discover option
 EXPOSE 8181

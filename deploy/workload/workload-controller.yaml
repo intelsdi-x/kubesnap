@@ -3,10 +3,10 @@ kind: ReplicationController
 metadata:
   labels:
     name: workload-rc
-  name: workload-controller
+  name: workload
   namespace: kube-system
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     name: workload-rc
   template:
@@ -20,3 +20,6 @@ spec:
         resources:
           requests:
             cpu: "1000m"
+        ports:
+        - name: api
+          containerPort: 7777
