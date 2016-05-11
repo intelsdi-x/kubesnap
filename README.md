@@ -9,7 +9,7 @@
 ```
 kubectl label nodes 10.91.97.195 tribe-role=chief
 ```
-- Other minion nodes labeled as tribe member:
+- Other minion nodes labeled as tribe members:
 ```
 kubectl label nodes 10.91.97.194 tribe-role=member
 ```
