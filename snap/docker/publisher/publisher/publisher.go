@@ -1,3 +1,22 @@
+/*
+http://www.apache.org/licenses/LICENSE-2.0.txt
+
+
+Copyright 2016 Intel Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package publisher
 
 import (
@@ -8,18 +27,18 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
+	"encoding/json"
+	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/exchange"
+	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/server"
+	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/util"
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
 	"os"
-	"sync"
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/exchange"
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/server"
-	"strings"
-	"sort"
-	"encoding/json"
-	"github.com/intelsdi-x/kubesnap/snap/docker/publisher/util"
 	"path/filepath"
+	"sort"
+	"strings"
+	"sync"
 )
 
 const (
@@ -28,22 +47,28 @@ const (
 	pluginType = plugin.PublisherPluginType
 )
 
-const dockerMetricPrefix = "/intel/linux/docker"
-const defStatsDepth = 10
+const (
+	dockerMetricPrefix = "/intel/linux/docker"
+	defStatsDepth      = 10
+	defServerPort      = 8777
+	cfgStatsDepth      = "stats_depth"
+	cfgServerPort      = "server_port"
+)
 
 type core struct {
-	logger *log.Logger
-	state  *exchange.InnerState
-	once   sync.Once
+	logger         *log.Logger
+	state          *exchange.InnerState
+	once           sync.Once
+	statsDepth     int
 	metricTemplate MetricTemplate
 }
 
 func NewInnerState() *exchange.InnerState {
 	res := &exchange.InnerState{
 		RecentMetrics: map[string]plugin.MetricType{},
-		DockerPaths : map[string]string {},
-		DockerStorage : map[string]interface{} {},
-		}
+		DockerPaths:   map[string]string{},
+		DockerStorage: map[string]interface{}{},
+	}
 	return res
 }
 
@@ -51,8 +76,9 @@ func NewCore() (*core, error) {
 	log.SetOutput(os.Stderr)
 	logger := log.New()
 	core := core{
-		state: NewInnerState(),
-		logger: logger,
+		state:      NewInnerState(),
+		logger:     logger,
+		statsDepth: defStatsDepth,
 	}
 	if err := core.loadMetricTemplate(); err != nil {
 		return nil, err
@@ -60,21 +86,9 @@ func NewCore() (*core, error) {
 	return &core, nil
 }
 
-func (f *core) EnsureInitialized() {
-	f.once.Do(func() {
-		defer func() {
-			if r := recover(); r != nil {
-				f.logger.Errorf("Caught an error: %s", r)
-			}
-		}()
-		//f.state = &exchange.InnerState{}
-		server.EnsureStarted(f.state)
-	})
-}
-
 func (f *core) Publish(contentType string, content []byte, config map[string]ctypes.ConfigValue) error {
 	//f.logger.Printf("Publishing, YOAH! pid: %s \n", os.Getpid())
-	f.EnsureInitialized()
+	f.ensureInitialized(config)
 	var metrics []plugin.MetricType
 
 	switch contentType {
@@ -98,13 +112,43 @@ func (f *core) Publish(contentType string, content []byte, config map[string]cty
 	return nil
 }
 
+func Meta() *plugin.PluginMeta {
+	return plugin.NewPluginMeta(
+		name, version, pluginType,
+		[]string{plugin.SnapGOBContentType},
+		[]string{plugin.SnapGOBContentType},
+		plugin.ConcurrencyCount(999))
+}
+
+func (f *core) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
+	cp := cpolicy.New()
+	p := cpolicy.NewPolicyNode()
+	rule1, _ := cpolicy.NewIntegerRule(cfgServerPort, false, defServerPort)
+	rule2, _ := cpolicy.NewIntegerRule(cfgStatsDepth, false, defStatsDepth)
+	p.Add(rule1, rule2)
+	cp.Add([]string{}, p)
+	return cp, nil
+}
+
+func (f *core) ensureInitialized(config map[string]ctypes.ConfigValue) {
+	f.once.Do(func() {
+		defer func() {
+			if r := recover(); r != nil {
+				f.logger.Errorf("Caught an error: %s", r)
+			}
+		}()
+		f.statsDepth = config[cfgStatsDepth].(ctypes.ConfigValueInt).Value
+		server.EnsureStarted(f.state, config[cfgServerPort].(ctypes.ConfigValueInt).Value)
+	})
+}
+
 type InMetrics []plugin.MetricType
 
-func (m InMetrics) Len() int{
+func (m InMetrics) Len() int {
 	return len(m)
 }
 
-func (m InMetrics) Swap(i, j int)      {
+func (m InMetrics) Swap(i, j int) {
 	m[i], m[j] = m[j], m[i]
 }
 
@@ -120,7 +164,7 @@ func (m InMetrics) Less(i, j int) bool {
 }
 
 type MetricTemplate struct {
-	source string
+	source      string
 	statsSource string
 	mapToDocker map[string]string
 }
@@ -139,12 +183,12 @@ func (f *core) loadMetricTemplate() error {
 		return err
 	}
 	templateObj := templateRef.(map[string]interface{})
-	extractMapping := func(obj interface{}) (map[string]string) {
-		mapping := map[string]string {}
+	extractMapping := func(obj interface{}) map[string]string {
+		mapping := map[string]string{}
 		tmplWalker := jsonutil.NewObjWalker(obj)
 		tmplWalker.Walk("/", func(target string, info os.FileInfo, _ error) error {
 			if source, isStr := info.Sys().(string); isStr &&
-					strings.HasPrefix(source, "/") {
+				strings.HasPrefix(source, "/") {
 				mapping[source] = target
 			}
 			return nil
@@ -168,7 +212,7 @@ func (f *core) loadMetricTemplate() error {
 	statsTemplate, _ := json.Marshal(statsObj)
 	dockerTemplate, _ := json.Marshal(templateObj)
 	f.metricTemplate = MetricTemplate{
-		source: string(dockerTemplate),
+		source:      string(dockerTemplate),
 		statsSource: string(statsTemplate),
 		mapToDocker: extractMapping(statsObj)}
 	////FIXMED: REMOVEIT \/
@@ -197,7 +241,7 @@ func (f *core) extractDockerIdAndPath(metric *plugin.MetricType) (string, string
 	}
 	tailSplit := strings.Split(strings.TrimLeft(strings.TrimPrefix(ns, dockerMetricPrefix), "/"), "/")
 	id := tailSplit[0]
-	path := "/"+ id
+	path := "/" + id
 	return id, path, true
 }
 
@@ -205,7 +249,7 @@ func (f *core) processMetrics(metrics []plugin.MetricType) {
 	sort.Sort(InMetrics(metrics))
 	dockerPaths := f.state.DockerPaths
 	dockerStorage := f.state.DockerStorage
-	temporaryStats := map[string]map[string]interface{} {}
+	temporaryStats := map[string]map[string]interface{}{}
 	fetchObjectForDocker := func(id, path string, metric *plugin.MetricType) map[string]interface{} {
 		//TODO: support the docker tree
 		if dockerObj, gotIt := dockerStorage[path]; gotIt {
@@ -215,6 +259,9 @@ func (f *core) processMetrics(metrics []plugin.MetricType) {
 			dockerPaths[path] = id
 			var dockerMap map[string]interface{}
 			json.Unmarshal([]byte(f.metricTemplate.source), &dockerMap)
+			dockerMap["name"] = path
+			dockerMap["id"] = id
+
 			dockerStorage[path] = dockerMap
 			return dockerMap
 		}
@@ -239,7 +286,7 @@ func (f *core) processMetrics(metrics []plugin.MetricType) {
 				return sourcePath, true
 			}
 		}
-		customPath := ns[strings.LastIndex(ns, path) + len(path):]
+		customPath := ns[strings.LastIndex(ns, path)+len(path):]
 		return customPath, false
 	}
 	insertIntoStats := func(dockerPath string, statsObj map[string]interface{}, metric *plugin.MetricType) {
@@ -268,7 +315,7 @@ func (f *core) processMetrics(metrics []plugin.MetricType) {
 			return
 		}
 		statsList := dockerObj["stats"].([]interface{})
-		if len(statsList) == defStatsDepth {
+		if len(statsList) == f.statsDepth {
 			statsList = statsList[:copy(statsList, statsList[1:])]
 		}
 		statsList = append(statsList, statsObj)
@@ -284,27 +331,4 @@ func (f *core) processMetrics(metrics []plugin.MetricType) {
 	for path, id := range dockerPaths {
 		mergeStatsForDocker(id, path)
 	}
-}
-
-
-
-func Meta() *plugin.PluginMeta {
-	return plugin.NewPluginMeta(
-		name, version, pluginType,
-		[]string{plugin.SnapGOBContentType},
-		[]string{plugin.SnapGOBContentType},
-		plugin.ConcurrencyCount(999))
-}
-
-func (f *core) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
-	cp := cpolicy.New()
-	//config := cpolicy.NewPolicyNode()
-	//
-	//r1, err := cpolicy.NewStringRule("file", true)
-	//handleErr(err)
-	//r1.Description = "Absolute path to the output file for publishing"
-	//
-	//config.Add(r1)
-	//cp.Add([]string{""}, config)
-	return cp, nil
 }
