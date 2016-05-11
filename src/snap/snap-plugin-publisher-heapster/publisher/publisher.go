@@ -28,9 +28,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"encoding/json"
-	"github.com/intelsdi-x/kubesnap/src/snap/publisher/exchange"
-	"github.com/intelsdi-x/kubesnap/src/snap/publisher/server"
-	"github.com/intelsdi-x/kubesnap/src/snap/publisher/util"
+	"github.com/intelsdi-x/kubesnap/src/snap/snap-plugin-publisher-heapster/exchange"
+	"github.com/intelsdi-x/kubesnap/src/snap/snap-plugin-publisher-heapster/server"
+	"github.com/intelsdi-x/kubesnap/src/snap/snap-plugin-publisher-heapster/util"
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
@@ -62,6 +62,8 @@ type core struct {
 	statsDepth     int
 	metricTemplate MetricTemplate
 }
+
+type ConfigMap map[string]ctypes.ConfigValue
 
 func NewInnerState() *exchange.InnerState {
 	res := &exchange.InnerState{
@@ -124,15 +126,25 @@ func (f *core) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
 	return cp, nil
 }
 
+func (m ConfigMap) GetInt(key string, defValue int) int {
+	if value, gotIt := m[key]; gotIt {
+		return value.(ctypes.ConfigValueInt).Value
+	} else {
+		return defValue
+	}
+}
+
 func (f *core) ensureInitialized(config map[string]ctypes.ConfigValue) {
+	configMap := ConfigMap(config)
 	f.once.Do(func() {
 		defer func() {
 			if r := recover(); r != nil {
 				f.logger.Errorf("Caught an error: %s", r)
 			}
 		}()
-		f.statsDepth = config[cfgStatsDepth].(ctypes.ConfigValueInt).Value
-		server.EnsureStarted(f.state, config[cfgServerPort].(ctypes.ConfigValueInt).Value)
+		f.statsDepth = configMap.GetInt(cfgStatsDepth, defStatsDepth)
+		serverPort := configMap.GetInt(cfgServerPort, defServerPort)
+		server.EnsureStarted(f.state, serverPort)
 	})
 }
 
