@@ -15,7 +15,7 @@ spec:
       containers:
       - name: snap
         image: 10.1.23.1:5000/snap:1
-        args: ["--tribe-seed", "10.91.97.195"]
+        args: ["--tribe", "--tribe-seed", "10.91.97.195"]
         volumeMounts:
           - mountPath: /sys/fs/cgroup
             name: cgroup
@@ -25,6 +25,7 @@ spec:
         - containerPort: 8181
           hostPort: 8181
           name: snap-api
+        imagePullPolicy: Always
       nodeSelector:
         tribe-role: member
       volumes:

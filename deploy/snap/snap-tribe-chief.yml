@@ -19,6 +19,7 @@ spec:
     - containerPort: 8181
       hostPort: 8181
       name: snap-api
+    imagePullPolicy: Always
   nodeSelector:
     tribe-role: chief
   volumes:

@@ -30,6 +30,18 @@ git reset --hard de510e4bdcdea96722b5bde19ff0b7a142939485
 git clone https://github.com/intelsdi-x/kubesnap.git
 ```
 
+- Clone **kubesnap-plugin-publisher-heapster**
+```
+cd kubesnap/src/snap
+git clone https://github.com/intelsdi-x/kubesnap-plugin-publisher-heapster.git
+```
+
+- Clone **kubesnap-plugin-collector-docker**
+```
+cd kubesnap/src/snap
+https://github.com/intelsdi-x/kubesnap-plugin-collector-docker.git
+```
+
 - Build **Heapster** container
 ```
 cd kubesnap/src/heapster
