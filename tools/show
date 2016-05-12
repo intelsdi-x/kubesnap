@@ -1,0 +1,25 @@
+#/bin/sh
+
+function show_all {
+  echo "---Replication Controllers";kubectl get rc --all-namespaces; echo 
+  echo "---Services"; kubectl get svc --all-namespaces; echo 
+  echo "---Pods"; kubectl get pods -o wide --all-namespaces; echo 
+  echo "---Workload Pods IPs"; kubectl get pods --namespace=kube-system -o=custom-columns=NAME:.metadata.name,NODE:.status.hostIP,"POD IP":.status.podIP -l name=workload-rc; echo 
+  echo "---Daemon Sets"; kubectl get ds --all-namespaces; echo 
+  echo "---HPA"; kubectl get hpa --all-namespaces
+}
+
+function show_nodes {
+  kubectl get nodes -L "tribe-role"
+}
+
+for word in $*; do
+  case "$word" in
+    "all" )
+      show_all
+    ;;
+    "nodes" )
+      show_nodes
+    ;;
+  esac
+done

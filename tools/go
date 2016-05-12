@@ -1,0 +1,40 @@
+#!/bin/sh
+
+function go_heapster {
+  kubectl create -f /home/core/kubesnap/deploy/heapster/multi-node
+}
+
+function go_workload {
+  kubectl create -f /home/core/kubesnap/deploy/workload
+}
+
+function go_snap {
+  kubectl create -f /home/core/kubesnap/deploy/snap
+}
+
+function go_hpa {
+  kubectl autoscale rc workload-controller --min=1 --max=6 --cpu-percent=50 --namespace=kube-system
+}
+
+for word in $*; do 
+  case "$word" in
+    "all" )
+      go_snap
+      go_heapster
+      go_workload
+      go_hpa
+    ;;
+    "heapster" )
+      go_heapster
+    ;;
+    "workload" )
+      go_workload
+    ;;
+    "snap" )
+      go_snap
+    ;;
+    "hpa" )
+      go_hpa
+    ;;
+  esac
+done

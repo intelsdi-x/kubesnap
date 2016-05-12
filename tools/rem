@@ -1,0 +1,46 @@
+#!/bin/sh
+
+function rem_heapster {
+  kubectl delete rc heapster --namespace=kube-system 
+  kubectl delete rc influxdb-grafana --namespace=kube-system 
+  kubectl delete svc monitoring-influxdb --namespace=kube-system 
+  kubectl delete svc monitoring-grafana --namespace=kube-system 
+  kubectl delete svc heapster --namespace=kube-system
+}
+
+function rem_workload {
+  kubectl delete rc workload --namespace=kube-system
+}
+
+function rem_snap {
+  kubectl delete pod snap --namespace=kube-system
+  kubectl delete ds snap --namespace=kube-system
+}
+
+function rem_hpa {
+  kubectl delete hpa workload --namespace=kube-system
+}
+
+for word in $*; do 
+  case "$word" in
+    "all" )
+      rem_heapster
+      rem_workload
+      rem_snap
+      rem_hpa
+    ;;
+    "heapster" )
+      rem_heapster
+    ;;
+    "workload" )
+      rem_workload
+      rem_hpa
+    ;;
+    "snap" )
+      rem_snap
+    ;;
+    "hpa" )
+      rem_hpa
+    ;;
+  esac
+done
