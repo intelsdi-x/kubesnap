@@ -10,6 +10,13 @@ function go_workload {
 
 function go_snap {
   kubectl create -f /home/core/kubesnap/deploy/snap
+  sleep 5
+  snapctl -u 'http://10.91.97.195:8181' agreement create core
+  snapctl -u 'http://10.91.97.195:8181' agreement join core node1
+  snapctl -u 'http://10.91.97.195:8181' agreement join core node2
+  snapctl -u 'http://10.91.97.195:8181' agreement join core node3
+  echo "Tribe members"
+  snapctl -u 'http://10.91.97.195:8181' agreement members core
 }
 
 function go_hpa {
