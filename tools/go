@@ -20,7 +20,7 @@ function go_snap {
 }
 
 function go_hpa {
-  kubectl autoscale rc workload-controller --min=1 --max=6 --cpu-percent=50 --namespace=kube-system
+  kubectl autoscale rc workload --min=1 --max=6 --cpu-percent=50 --namespace=kube-system
 }
 
 for word in $*; do 
