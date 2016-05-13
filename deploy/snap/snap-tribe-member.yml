@@ -27,7 +27,7 @@ spec:
           name: snap-api
         - containerPort: 8777
           hostPort: 8777
-          name: heapster-publisher
+          name: publisher-api
         imagePullPolicy: Always
       nodeSelector:
         tribe-role: member
