@@ -45,5 +45,5 @@ RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-publisher-heapster/build
 RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-collector-docker/build/rootfs/snap-plugin-collector-docker /opt/snap/plugins
 
 # Start snap daemon
-EXPOSE 8181
+EXPOSE 8181 8777
 ENTRYPOINT ["/usr/local/bin/snapd", "-t", "0", "-a", "/opt/snap/plugins"]
