@@ -25,3 +25,4 @@ spec:
         ports:
         - name: api
           containerPort: 7777
+        imagePullPolicy: Always
