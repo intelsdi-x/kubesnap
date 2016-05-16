@@ -2,7 +2,15 @@ FROM ubuntu
 MAINTAINER mateusz.kleina@intel.com
 
 RUN apt-get update
-RUN apt-get -y install wget curl make git
+RUN apt-get -y install wget curl make git vim netcat
+
+ENV DOCKER_BUCKET get.docker.com
+ENV DOCKER_VERSION 1.10.3
+ENV DOCKER_SHA256 d0df512afa109006a450f41873634951e19ddabf8c7bd419caeb5a526032d86d
+
+RUN curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION" -o /usr/local/bin/docker \
+	&& echo "${DOCKER_SHA256}  /usr/local/bin/docker" | sha256sum -c - \
+	&& chmod +x /usr/local/bin/docker
 
 # get golang for building snap and plugins
 ENV GOLANG_VERSION 1.6.1
@@ -16,15 +24,16 @@ RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-ENV GOMAXPROCS=2
+ENV GOMAXPROCS=1
 
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
 # build snap (with support of dynamic query mechanism)
-RUN git clone https://github.com/IzabellaRaulin/snap.git /go/src/github.com/intelsdi-x/snap
+#RUN git clone https://github.com/IzabellaRaulin/snap.git /go/src/github.com/intelsdi-x/snap
+#RUN git checkout remotes/origin/specific_dynamic_metric_rebased
+#RUN git reset --hard 6e9c54b3c9cd14f1844ccc78b04ca4665810abce
+RUN git clone https://github.com/intelsdi-x/snap.git /go/src/github.com/intelsdi-x/snap
 WORKDIR /go/src/github.com/intelsdi-x/snap
-RUN git checkout remotes/origin/specific_dynamic_metric_rebased
-RUN git reset --hard 6e9c54b3c9cd14f1844ccc78b04ca4665810abce
 RUN make && make install
 
 # build heapster publisher
@@ -43,6 +52,7 @@ RUN mkdir -p /opt/snap/plugins
 # Install plugins in autoload directory
 RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-publisher-heapster/build/rootfs/snap-plugin-publisher-heapster /opt/snap/plugins
 RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-collector-docker/build/rootfs/snap-plugin-collector-docker /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap/build/plugin/snap-publisher-file /opt/snap/plugins
 
 # Start snap daemon
 EXPOSE 8181 8777

@@ -23,6 +23,8 @@ spec:
       hostPort: 8777
       name: publisher-api
     imagePullPolicy: Always
+    securityContext:
+      privileged: true
   nodeSelector:
     tribe-role: chief
   volumes:
