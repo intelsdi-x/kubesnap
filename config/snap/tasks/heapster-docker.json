@@ -1,0 +1,26 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "1s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+                "/intel/docker/*": {}
+            },
+            "config": {},
+         "publish":[
+            {
+               "plugin_name": "heapster",
+               "config": {
+                  "stats_depth": 0,
+                  "server_port": 8777,
+                  "stats_span": "10m",
+                  "export_tmpl_file": "builtin"
+               }
+            }
+         ]
+       }
+    }
+}
