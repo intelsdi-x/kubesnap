@@ -26,7 +26,7 @@ spec:
     securityContext:
       privileged: true
   nodeSelector:
-    tribe-role: chief
+    tribe-role: seed
   volumes:
     - name: cgroup
       hostPath:
