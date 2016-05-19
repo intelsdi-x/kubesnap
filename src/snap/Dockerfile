@@ -56,4 +56,4 @@ RUN cp -a /go/src/github.com/intelsdi-x/snap/build/plugin/snap-publisher-file /o
 
 # Start snap daemon
 EXPOSE 8181 8777
-ENTRYPOINT ["/usr/local/bin/snapd", "-t", "0", "-a", "/opt/snap/plugins"]
+ENTRYPOINT ["/usr/local/bin/snapd", "-l", "1", "-t", "0", "-a", "/opt/snap/plugins"]
