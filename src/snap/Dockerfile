@@ -46,14 +46,28 @@ COPY kubesnap-plugin-collector-docker /go/src/github.com/intelsdi-x/kubesnap-plu
 WORKDIR /go/src/github.com/intelsdi-x/kubesnap-plugin-collector-docker
 RUN make
 
-# Create directory for snap plugins autoload
+# create directory for snap plugins and task autoload
 RUN mkdir -p /opt/snap/plugins
+RUN mkdir -p /opt/snap/tasks
+
+# build start_snap binary
+COPY start_snap /go/src/start_snap
+WORKDIR /go/src/start_snap
+RUN go build -o start_snap
+RUN cp -a /go/src/start_snap/start_snap /usr/local/bin/start_snap 
+
+# copy task
+COPY tasks /opt/snap/tasks
 
 # Install plugins in autoload directory
 RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-publisher-heapster/build/rootfs/snap-plugin-publisher-heapster /opt/snap/plugins
 RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-collector-docker/build/rootfs/snap-plugin-collector-docker /opt/snap/plugins
 RUN cp -a /go/src/github.com/intelsdi-x/snap/build/plugin/snap-publisher-file /opt/snap/plugins
 
-# Start snap daemon
+# start snap daemon
+ENV SNAPD_BIN /usr/local/bin/snapd
+ENV SNAPCTL_BIN /usr/local/bin/snapctl
+ENV PLUGINS_AUTOLOAD_DIR /opt/snap/plugins 
+ENV TASK_AUTOLOAD_FILE /opt/snap/tasks/heapster-docker.json
 EXPOSE 8181 8777
-ENTRYPOINT ["/usr/local/bin/snapd", "-l", "1", "-t", "0", "-a", "/opt/snap/plugins"]
+ENTRYPOINT ["/usr/local/bin/start_snap"]

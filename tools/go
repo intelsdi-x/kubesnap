@@ -8,25 +8,12 @@ function go_workload {
   kubectl create -f /home/core/kubesnap/deploy/workload
 }
 
-function go_snap_seed {
-  kubectl create -f /home/core/kubesnap/deploy/snap/snap-tribe-seed.yml
-}
-
-function go_snap_mem {
-  kubectl create -f /home/core/kubesnap/deploy/snap/snap-tribe-member.yml
-}
-
-function go_tribe {
-  snapctl -u 'http://10.91.97.195:8181' agreement create core
-  snapctl -u 'http://10.91.97.195:8181' agreement join core node1
-  snapctl -u 'http://10.91.97.195:8181' agreement join core node2
-  snapctl -u 'http://10.91.97.195:8181' agreement join core node3
-  echo "Tribe members"
-  snapctl -u 'http://10.91.97.195:8181' agreement members core
+function go_snap {
+  kubectl create -f /home/core/kubesnap/deploy/snap
 }
 
 function go_hpa {
-  kubectl autoscale rc workload --min=1 --max=6 --cpu-percent=50 --namespace=kube-system
+  kubectl autoscale rc workload --min=3 --max=6 --cpu-percent=50 --namespace=kube-system
 }
 
 for word in $*; do 
@@ -43,11 +30,8 @@ for word in $*; do
     "workload" )
       go_workload
     ;;
-    "snap-seed" )
-      go_snap_seed
-    ;;
-    "snap-mem" )
-      go_snap_mem
+    "snap" )
+      go_snap
     ;;
     "tribe" )
       go_tribe
