@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: workload
-        image: 10.1.23.1:5000/workload:1
+        image: gcr.io/snap-11/workload:latest
         resources:
           requests:
             cpu: "1000m"
