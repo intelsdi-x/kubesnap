@@ -2,7 +2,7 @@ FROM ubuntu
 MAINTAINER mateusz.kleina@intel.com
 
 RUN apt-get update
-RUN apt-get -y install wget curl make git vim netcat
+RUN apt-get -y install wget curl make git vim netcat gcc
 
 ENV DOCKER_BUCKET get.docker.com
 ENV DOCKER_VERSION 1.10.3
@@ -28,10 +28,7 @@ ENV GOMAXPROCS=1
 
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
-# build snap (with support of dynamic query mechanism)
-#RUN git clone https://github.com/IzabellaRaulin/snap.git /go/src/github.com/intelsdi-x/snap
-#RUN git checkout remotes/origin/specific_dynamic_metric_rebased
-#RUN git reset --hard 6e9c54b3c9cd14f1844ccc78b04ca4665810abce
+# build snap
 RUN git clone https://github.com/intelsdi-x/snap.git /go/src/github.com/intelsdi-x/snap
 WORKDIR /go/src/github.com/intelsdi-x/snap
 RUN make && make install
