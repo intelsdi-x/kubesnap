@@ -65,6 +65,7 @@ RUN cp -a /go/src/github.com/intelsdi-x/snap/build/plugin/snap-publisher-file /o
 ENV SNAPD_BIN /usr/local/bin/snapd
 ENV SNAPCTL_BIN /usr/local/bin/snapctl
 ENV PLUGINS_AUTOLOAD_DIR /opt/snap/plugins 
+ENV PLUGINS_TO_LOAD 3
 ENV TASK_AUTOLOAD_FILE /opt/snap/tasks/heapster-docker.json
 EXPOSE 8181 8777
 ENTRYPOINT ["/usr/local/bin/start_snap"]
