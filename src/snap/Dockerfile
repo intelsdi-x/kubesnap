@@ -46,6 +46,7 @@ RUN make
 # create directory for snap plugins and task autoload
 RUN mkdir -p /opt/snap/plugins
 RUN mkdir -p /opt/snap/tasks
+RUN mkdir -p /proc_host
 
 # build start_snap binary
 COPY start_snap /go/src/start_snap
@@ -67,5 +68,6 @@ ENV SNAPCTL_BIN /usr/local/bin/snapctl
 ENV PLUGINS_AUTOLOAD_DIR /opt/snap/plugins 
 ENV PLUGINS_TO_LOAD 3
 ENV TASK_AUTOLOAD_FILE /opt/snap/tasks/heapster-docker.json
+ENV PROCFS_MOUNT /proc_host
 EXPOSE 8181 8777
 ENTRYPOINT ["/usr/local/bin/start_snap"]
