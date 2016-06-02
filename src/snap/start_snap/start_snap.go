@@ -14,14 +14,30 @@ type Plugins struct {
 }
 
 type Body struct {
-        LoadedPluigns []interface{} `json:"loaded_plugins"`
+        LoadedPlugins []interface{} `json:"loaded_plugins"`
+}
+
+func getPlugins(path string) []string {
+        var plugins []string
+        files, _ := ioutil.ReadDir(path)
+        for _, p := range files {
+                plugins = append(plugins, path + "/" + p.Name())
+        }
+        return plugins
 }
 
 func main() {
+        pluginsDir := os.Getenv("PLUGINS_AUTOLOAD_DIR")
+        pluginsToLoad := os.Getenv("PLUGINS_TO_LOAD")
+        snapd := os.Getenv("SNAPD_BIN")
+        snapctl := os.Getenv("SNAPCTL_BIN")
+        task := os.Getenv("TASK_AUTOLOAD_FILE")
+
         plugins := Plugins{}
         var wg sync.WaitGroup
+
         wg.Add(2)
-        go exec.Command(os.Getenv("SNAPD_BIN"), "-t", "0", "-a", os.Getenv("PLUGINS_AUTOLOAD_DIR")).Run()
+        go exec.Command(snapd, "-t", "0", "-a", pluginsDir).Run()
         go func() {
                 defer wg.Done()
                 for true {
@@ -37,12 +53,16 @@ func main() {
                                         return
                                 }
                                 json.Unmarshal(body, &plugins)
-                                numPlugins, _ := strconv.Atoi(os.Getenv("PLUGINS_TO_LOAD"))
-                                if len(plugins.Body.LoadedPluigns) < numPlugins {
+                                numPlugins, _ := strconv.Atoi(pluginsToLoad)
+                                if len(plugins.Body.LoadedPlugins) < numPlugins {
+					// force load
+                                        for _, p := range getPlugins(pluginsDir ) {
+                                                exec.Command(snapctl, "plugin", "load", p).Run()
+                                        }
                                         time.Sleep(time.Second)
                                         continue
                                 }
-                                exec.Command(os.Getenv("SNAPCTL_BIN"), "task", "create", "-t", os.Getenv("TASK_AUTOLOAD_FILE")).Run()
+                                exec.Command(snapctl, "task", "create", "-t", task).Run()
                                 return
                         }
                         continue
