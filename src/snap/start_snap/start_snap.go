@@ -37,7 +37,7 @@ func main() {
         var wg sync.WaitGroup
 
         wg.Add(2)
-        go exec.Command(snapd, "-t", "0", "-a", pluginsDir).Run()
+        go exec.Command(snapd, "-t", "0").Run()
         go func() {
                 defer wg.Done()
                 for true {
@@ -55,7 +55,6 @@ func main() {
                                 json.Unmarshal(body, &plugins)
                                 numPlugins, _ := strconv.Atoi(pluginsToLoad)
                                 if len(plugins.Body.LoadedPlugins) < numPlugins {
-					// force load
                                         for _, p := range getPlugins(pluginsDir ) {
                                                 exec.Command(snapctl, "plugin", "load", p).Run()
                                         }
