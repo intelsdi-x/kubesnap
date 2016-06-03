@@ -57,8 +57,8 @@ func main() {
                                 if len(plugins.Body.LoadedPlugins) < numPlugins {
                                         for _, p := range getPlugins(pluginsDir ) {
                                                 exec.Command(snapctl, "plugin", "load", p).Run()
-                                                time.Sleep(4 * time.Second)
                                         }
+                                        time.Sleep(time.Second)
                                         continue
                                 }
                                 exec.Command(snapctl, "task", "create", "-t", task).Run()
