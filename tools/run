@@ -1,1 +1,1 @@
--it --namespace=kube-system $*
+kubectl exec -it --namespace=kube-system $*
