@@ -1,0 +1,23 @@
+On kubernetes master host (GCE):
+  cd /tmp
+  git clone https://github.com/intelsdi-x/kubesnap.git
+  source test.env 
+
+
+show - show kubernetes cluster status (RC, SVC, PODS, DS)
+----
+bash show
+
+list - list tasks and plugins, returns json
+----
+bash list tasks <snap_pod_ip>
+bash list plugins <snap_pod_ip>
+
+load - load task or plugin, returns json
+----
+bash load task <snap_pod_ip> <task_file_name>
+bash load plugin <snap_pod_ip> <plugin_file_name>
+
+run - run command inside docker container
+---
+bash run <pod_name> <command>

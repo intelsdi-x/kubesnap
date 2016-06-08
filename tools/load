@@ -1,12 +1,8 @@
-#!/bin/bash
-
-if [ "$#" -eq 2 ]; then
-  app_type="Content-Type: application/json"
-  load="{\"load\":${2}}"
-
-  curl -H "${app_type}" -X POST -d "${load}" http://${1}:7777/set_load
-fi
-
-if [ "$#" -eq 1 ]; then
-    curl http://${1}:7777/load
-fi
+case "$1" in
+  "task" )
+    curl -v http://$2:8181/v1/tasks -d @/tmp/kubesnap/tools/$3 --header "Content-Type: application/json"
+  ;;
+  "plugin" )
+    curl -F plugin=@/tmp/kubesnap/tools/$3 http://$2:8181/v1/plugins
+  ;;
+esac

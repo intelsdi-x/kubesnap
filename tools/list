@@ -1,0 +1,8 @@
+case "$1" in
+  "tasks" )
+    curl -L http://$2:8181/v1/tasks
+  ;;
+  "plugins" )
+    curl -L http://$2:8181/v1/plugins 
+  ;;
+esac
