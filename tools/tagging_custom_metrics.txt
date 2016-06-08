@@ -1,0 +1,33 @@
+Tagging custom metrics for heapster publisher
+----
+
+custom_metric_name: 
+	- specifies the name of the custom metric that will appear in "custom_metrics" under "spec" and "stats"; 
+	- default value for metric name is its full namespace converted to string
+custom_metric_type:
+	- specifies the cadvisor metric type (gauge/cumulative/delta)
+	- corresponds to cadvisor/info/v1/MetricSpec.Type
+	- default value for metric type is: "gauge"
+custom_metric_format:
+	- specifies the cadvisor metric format (int/float)
+	- corresponds to cadvisor/info/v1/MetricSpec.Format
+	- default value for metric format is: "int"
+	- most flexible format is: "float" - publisher will be able to convert any numeric data type into a float
+custom_metric_units:
+	- specifies the cadvisor metric units (plain string)
+	- corresponds to cadvisor/info/v1/MetricSpec.Units
+	- default value for units is: "none"
+custom_metric_container_path:
+	- if present specifies a full name (path) to a target container that will receive the custom metrics
+	- defaults to "/"
+
+To have custom metrics appear in publisher's response a metric must expose at least one tag of the:
+	- custom_metric_name, OR
+	- custom_metric_type, OR
+	- custom_metric_format, OR
+	- custom_metric_units.
+If any of those tags is present, all other fields in MetricSpec will be filled with defaults explained above.
+The most reasonable tag to set is  custom_metric_format; publisher will be able to convert any numeric data type into float.
+
+
+
