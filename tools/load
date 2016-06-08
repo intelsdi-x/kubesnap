@@ -1,6 +1,7 @@
 case "$1" in
   "task" )
-    curl -v http://$2:8181/v1/tasks -d @/tmp/kubesnap/tools/$3 --header "Content-Type: application/json"
+    id=$(curl -v http://$2:8181/v1/tasks -d @/tmp/kubesnap/tools/$3 --header "Content-Type: application/json" | grep id | cut -f4 -d"\"")
+    curl -XPUT http://$2:8181/v1/tasks/$id/start
   ;;
   "plugin" )
     curl -F plugin=@/tmp/kubesnap/tools/$3 http://$2:8181/v1/plugins
