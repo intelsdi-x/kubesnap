@@ -1,0 +1,23 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "1s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+                "/intel/procfs/cpu/*" : {}
+            },
+            "process": null,
+            "publish": [
+                {
+                    "plugin_name": "file",
+                    "config": {
+                        "file": "/tmp/published_cpu"
+                    }
+                }
+            ]
+        }
+    }
+}
