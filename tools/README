@@ -1,7 +1,7 @@
 On kubernetes master host (GCE):
   cd /tmp
-  cd kubernetes
   git clone https://github.com/intelsdi-x/kubesnap.git
+  cd kubesnap
   source test.env 
 
 
