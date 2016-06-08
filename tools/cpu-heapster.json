@@ -1,0 +1,30 @@
+{    
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "5s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+                "/intel/procfs/cpu/*": {}
+            },
+            "tags": {
+                "/intel/procfs/cpu": {
+                        "custom_metric_format": "float"
+                }
+            },
+            "publish":[
+            {
+               "plugin_name": "heapster",
+               "config": {
+                  "stats_depth": 0,
+                  "server_port": 8777,
+                  "stats_span": "10m",
+                  "export_tmpl_file": "builtin"
+               }
+            }
+         ]
+       }
+    }
+}
