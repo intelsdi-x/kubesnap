@@ -1,0 +1,29 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "1s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+                "/intel/mysql/mysql_innodb_data/writes": {},
+                "/intel/mysql/mysql_innodb_rows/read": {},
+                "/intel/mysql/threads/connected": {},
+                "/intel/mysql/threads/running": {},
+                "/intel/mysql/mysql_octets/rx": {},
+                "/intel/mysql/mysql_octets/tx": {}
+            },
+            "config": {},
+            "process": null,
+            "publish": [
+                {
+                    "plugin_name": "file",
+                    "config": {
+                        "file": "/tmp/published_mysql"
+                    }
+                }
+            ]
+        }
+    }
+}
