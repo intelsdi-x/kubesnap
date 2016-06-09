@@ -2,19 +2,20 @@
     "version": 1,
     "schedule": {
         "type": "simple",
-        "interval": "1s"
+        "interval": "2s"
     },
     "workflow": {
         "collect": {
             "metrics": {
-                "/intel/procfs/cpu/*" : {}
+                "/intel/procfs/cpu/*/utilization_jiffies" : {},
+                "/intel/procfs/cpu/*/active_jiffies" : {}
             },
             "process": null,
             "publish": [
                 {
                     "plugin_name": "file",
                     "config": {
-                        "file": "/tmp/published_cpu"
+                        "file": "/tmp/cpu-metrics"
                     }
                 }
             ]
