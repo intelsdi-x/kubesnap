@@ -4,6 +4,7 @@
         "type": "simple",
         "interval": "10s"
     },
+    "deadline": "10s",
     "workflow": {
         "collect": {
             "metrics": {
