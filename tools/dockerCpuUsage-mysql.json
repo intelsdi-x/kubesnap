@@ -1,0 +1,30 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "5s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+                "/intel/docker/*/cgroups/cpu_stats/cpu_usage/*" : {}
+            },
+            "process": null,
+            "publish": [
+                {
+                    "plugin_name": "mysql",
+                    "config": {
+                        "database": "snapdb",
+                        "table": "metrics"
+                    }
+                },
+                {
+                    "plugin_name": "file",
+                    "config": {
+                        "file": "/tmp/published_docker_cgroups_cpu_usage"
+                    }
+                }
+            ]
+        }
+    }
+}
