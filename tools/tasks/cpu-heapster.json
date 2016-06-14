@@ -1,5 +1,6 @@
-{
+{    
     "version": 1,
+    "name": "cpu_metrics_heapster_publisher",
     "schedule": {
         "type": "simple",
         "interval": "5s"
@@ -7,19 +8,13 @@
     "workflow": {
         "collect": {
             "metrics": {
-                "/intel/mysql/mysql_innodb_data/writes": {},
-                "/intel/mysql/mysql_innodb_rows/read": {},
-                "/intel/mysql/threads/connected": {},
-                "/intel/mysql/threads/running": {},
-                "/intel/mysql/mysql_octets/rx": {},
-                "/intel/mysql/mysql_octets/tx": {}
+                "/intel/procfs/cpu/*": {}
             },
             "tags": {
-                "/intel/mysql": {
+                "/intel/procfs/cpu": {
                         "custom_metric_format": "float"
                 }
             },
-            "process": null,
             "publish":[
             {
                "plugin_name": "heapster",

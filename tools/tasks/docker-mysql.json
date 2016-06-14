@@ -1,5 +1,6 @@
 {
     "version": 1,
+    "name": "docker_metrics_mysql_publisher",
     "schedule": {
         "type": "simple",
         "interval": "5s"

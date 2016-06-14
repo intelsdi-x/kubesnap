@@ -1,5 +1,6 @@
 {
     "version": 1,
+    "name": "docker_metrics_heapster_publisher",
     "schedule": {
         "type": "simple",
         "interval": "10s"
