@@ -1,6 +1,6 @@
 {
    "version":1,
-   "name":"cpu_metrics_heapster_publisher",
+   "name":"cpu_version_heapster_publisher",
    "schedule":{
       "type":"simple",
       "interval":"5s"
