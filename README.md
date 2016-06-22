@@ -39,7 +39,7 @@ git clone https://github.com/intelsdi-x/kubesnap-plugin-publisher-heapster.git
 - Clone **kubesnap-plugin-collector-docker**
 ```
 cd kubesnap/src/snap
-https://github.com/intelsdi-x/kubesnap-plugin-collector-docker.git
+git clone https://github.com/intelsdi-x/kubesnap-plugin-collector-docker.git
 ```
 
 - Build **Heapster** container
