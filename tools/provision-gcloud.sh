@@ -2,7 +2,7 @@
 set -e
 function usage {
         echo "Usage: "
-        echo "sudo $0 [OPTIONS]"
+        echo "$0 [OPTIONS]"
 	echo "  Each option can be either 0 or 1"
         echo "  --tribe		- 0 starts snapd without tribe support, 1 starts snapd with tribe support"
 	echo "  --docker	- 0 skips installation of docker engine, 1 install docker engine"
