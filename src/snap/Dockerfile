@@ -31,6 +31,7 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 # build snap
 RUN git clone https://github.com/intelsdi-x/snap.git /go/src/github.com/intelsdi-x/snap
 WORKDIR /go/src/github.com/intelsdi-x/snap
+RUN git reset --hard 902b9aec57f72943a244a744da39ef3e145df104
 RUN make && make install
 
 # build heapster publisher
