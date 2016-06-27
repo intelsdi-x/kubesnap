@@ -157,6 +157,9 @@ func main() {
                                 }
 	                        fmt.Fprintf(w, "All plugins loaded -  starting task\n")
 				w.Flush()
+                                // account for plugins loaded on remote nodes
+                                // TODO improve this
+                                time.Sleep(3 * time.Second)
                                 exec.Command(snapctl, "task", "create", "-t", task).Run()
                                 return
                         }
