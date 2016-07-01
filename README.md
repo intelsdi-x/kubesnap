@@ -1,124 +1,115 @@
 # kubesnap
 
 ## How to run
+1. [Prerequisites](#1-prerequisites)  
+2. [Start work with Google Cloud Platform](#2-start-work-with-google-cloud-platform)  
+3. [Install kubesnap](#3-install-kubesnap)
+4. [Contributing](#4-contributing)  
+5. [License](#5-license)  
+6. [Acknowledgements](#6-acknowledgements)  
 
-### Prerequisites
+### 1. Prerequisites
 
-- **Kubernetes** cluster - tested with Kubernetes on CoreOS
-- One minion node labeled as tribe chief:
-```
-kubectl label nodes 10.91.97.195 tribe-role=chief
-```
-- Other minion nodes labeled as tribe members:
-```
-kubectl label nodes 10.91.97.194 tribe-role=member
-```
+- **Kubernetes** cluster - tested with Kubernetes on Google Cloud Environment (GCE)
 
-### Steps
+### 2. Start work with Google Cloud Platform
 
-#### Building
+#### a) Open Google Cloud Platform Console
+ - go to https://console.cloud.google.com/  
+ - log in using your e-mail address
+ - follow the instruction [how to create a Cloud Platform Console project](https://cloud.google.com/storage/docs/quickstart-console)
 
-- Clone **Heapster**
-```
-git clone https://github.com/kubernetes/heapster.git
-cd heapster
-git reset --hard de510e4bdcdea96722b5bde19ff0b7a142939485
-```
 
-- Clone **kubesnap**
-```
-git clone https://github.com/intelsdi-x/kubesnap.git
-```
+#### b) Select your project  
+- select your project from the drop-down menu in the top right corner
+  ![Alt text](docs/images/image_01.png "Selecting a project in Cloud Platform Console")  
 
-- Clone **kubesnap-plugin-publisher-heapster**
-```
-cd kubesnap/src/snap
-git clone https://github.com/intelsdi-x/kubesnap-plugin-publisher-heapster.git
-```
+#### c) Switch to _**Compute Engine**_ screen
 
-- Clone **kubesnap-plugin-collector-docker**
-```
-cd kubesnap/src/snap
-git clone https://github.com/intelsdi-x/kubesnap-plugin-collector-docker.git
-```
+- select _Products & Services_ from GC Menu in the top left corner  
 
-- Build **Heapster** container
-```
-cd kubesnap/src/heapster
-docker build -t heapster-snap .
-docker tag heapster-snap <docker_registry>/heapster-snap:1
-docker push <docker_registry>/heapster-snap:1
-```
+  ![Alt text](docs/images/image_02.png "Google Cloud Console Menu") 
 
-- Build **Influxdb** container
-```
-cd heapster/influxdb
-docker build -t influxdb-snap .
-docker tag influxdb-snap <docker_registry>/influxdb-snap:1
-docker push <docker_registry>/influxdb-snap:1
-```
+- and then select _Compute Engine_ from the drop-down list
 
-- Build **Grafana** container
-```
-cd heapster/grafana
-docker build -t grafana-snap .
-docker tag grafana-snap <docker_registry>/grafana-snap:1
-docker push <docker_registry>/grafana-snap:1
-```
+  ![Alt text](docs/images/image_03.png "Selecting Compute Engine in Google Cloud Console Menu")
 
-- Build **snap** container
-```
-cd kubesnap/src/snap
-docker build -t snap .
-docker tag snap <docker_registry>/snap:1
-docker push <docker_registry>/snap:1
-```
+#### d) Create an VM instance  
+- create a new VM instance
+  ![Alt text](docs/images/image_04.png "Creating an VM instance")  
 
-- (Optional) Build **workload** container
-```
-cd kubesnap/src/workload
-docker build -t workload .
-docker tag workload <docker_registry>/workload:1
-docker push <docker_registry>/workload:1
-```
+- set an unique name of a new instance
+- choose a machine with 4 vCPUs (or more) and at least 15GB RAM
+- select Ubuntu 16.04 with standard persistent disk with at least 100GB
 
-- (Optional) Build **snap_stub** container
+  ![Alt text](docs/images/image_05.png "Setting up a new VM")  
+
+#### e) Start GCE Virtual Machine  
+- select your VM and choose _START_ option which is available on the top of screen
+
+  ![Alt text](docs/images/image_06.png "Staring an VM instance")  
+
+#### f) Open the VM terminal by click on SSH  
+ -  click on SSH to open the VM terminal (it will open as a new window)
+
+  ![Alt text](docs/images/image_07.png "Opening the terminal of Virtual Machine") 
+
+#### g) Authorize access to Google Cloud Platform  
+- manage credentials for the Google Cloud SD. To do that, run the following command:
+  ```
+  gcloud auth login
+  ```
+  Answer `Y` to the question (see below) and follow the instructions:
+  -	copy the link in your browser and 
+  -	authenticate with a service account which you use in Google Cloud Environment,
+  - copy the verification code from browser window and enter it
+
+  ![Alt text](docs/images/image_08.png "Access authorization to Google Cloud Platform")
+
+- check if you are on credentialed accounts:  
+ ```
+ gcloud auth list
+ ```
+
+
+### 3. Install kubesnap  
+Clone kubesnap into your home directory:
 ```
-cd kubesnap/src/snap_stub
-docker build -t snap_stub .
-docker tag snap_stub 10.1.23.1:5000/snap_stub:1
-docker push 10.1.23.1:5000/snap_stub:1
+git clone https://github.com/intelsdi-x/kubesnap
+```
+kubesnap supports automatic installation via script [provision-kubesnap.sh](https://github.com/intelsdi-x/kubesnap/blob/master/tools/provision-kubesnap.sh)
+
+Go to kubesnap/tools:
+```
+cd kubesnap/tools
 ```
 
-#### Running
+##### Building
 
-- Deploy snap (or snap_stub)
+- Build kubesnap:
 ```
-cd kubesnap/deploy
-kubectl create -f snap/ OR kubectl create -f snap_stub/
-```
-
-- Deploy Heapster, InfluxDB and Grafana
-```
-cd kubesnap/deploy
-kubectl create -f heapster/multi-node/
+./provision-kubesnap.sh
 ```
 
-- (Optional) Deploy workload
+- Build Kubernetes:
 ```
-cd kubesnap/deploy
-kubectl create -f workload/
+./provision-kubesnap.sh --kubernetes build
 ```
+##### Starting
+- Start Kubernetes cluster:
+```
+./provision-kubesnap.sh --kubernetes start
+```  
 
-#### Demo with Horizontal Pod Autoscaler 
+### 4. Contributing
+We love contributions!
 
-- Autoscale the workload, an example:
-```
-kubectl autoscale rc workload-controller --min=1 --max=5 --cpu-percent=5 --namespace=kube-system
-```
+There's more than one way to give back, from examples to blogs to code updates. See our recommended process in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-- Increase CPU utilization in workload-controller (in this example workload will use 2 CPUs):
-```
-curl -H "Content-Type: application/json" -X POST -d '{"load":2}' http://10.2.50.52:7777/set_load
-curl http://10.2.50.52:7777/load (to check current load)
-```
+And **thank you!** Your contribution, through code and participation, is incredibly important to us.
+
+### 5. License
+[snap](http://github.com:intelsdi-x/snap), along with this kubesnap, is an Open Source software released under the Apache 2.0 [License](LICENSE).
+
+### 6. Acknowledgements
+* Author: [Andrzej Kuriata](https://github.com/andrzej-k/)
