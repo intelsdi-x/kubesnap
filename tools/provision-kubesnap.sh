@@ -56,8 +56,8 @@ function clone_repos {
 
 function install_gcloud {
         # Installation of gcloud 114 version
-        if [ -f "$HOME/google-cloud-sdk/path.bash.inc" ];then
-                source $HOME/google-cloud-sdk/path.bash.inc
+        if [ -f "/opt/google-cloud-sdk/path.bash.inc" ];then
+                source /opt/google-cloud-sdk/path.bash.inc
         fi
         ver=`gcloud --version | grep "SDK" | awk '{print $4}'`
         if [ "$ver" == "114.0.0" ]; then
@@ -68,16 +68,16 @@ function install_gcloud {
         echo "===> DOWNLOADING gcloud tar ball"
         wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-114.0.0-linux-x86_64.tar.gz -O gcloud-sdk-114.tar.gz
         echo "===> UNPACKING tar ball"
-        tar -xf gcloud-sdk-114.tar.gz -C $HOME && rm gcloud-sdk-114.tar.gz
+        sudo tar -xf gcloud-sdk-114.tar.gz -C /opt/ && rm gcloud-sdk-114.tar.gz
         echo "===> INSTALLING gcloud"
-        yes | $HOME/google-cloud-sdk/install.sh
+        yes | sudo /opt/google-cloud-sdk/install.sh
         
         # The next line updates PATH for the Google Cloud SDK.
-        source $HOME/google-cloud-sdk/path.bash.inc
+        source /opt/google-cloud-sdk/path.bash.inc
         # The next line enables shell command completion for gcloud.
-        source $HOME/google-cloud-sdk/completion.bash.inc
+        source /opt/google-cloud-sdk/completion.bash.inc
         
-        expected=`echo $HOME/google-cloud-sdk/bin/gcloud`
+        expected=`echo /opt/google-cloud-sdk/bin/gcloud`
         current=`which gcloud`
         if [ "$current" != "$expected" ];then 
                 echo "===> ERROR gcloud version different then expected!"
