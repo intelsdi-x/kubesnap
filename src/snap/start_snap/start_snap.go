@@ -82,13 +82,23 @@ func main() {
 			time.Sleep(time.Second)
 			continue
 		}
-		fmt.Fprintf(w, "Starintg snapd with tribe seed: %s\n", tribeSeed)
+
+		fmt.Fprintf(w, "Starting snapd with tribe seed: %s\n", tribeSeed)
 		w.Flush()
-		go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe", "--tribe-seed", tribeSeed).Run()
+		cmd := exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe", "--tribe-seed", tribeSeed)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		go cmd.Run()
+
 		wg.Wait()
 	}
+
 	fmt.Fprintf(w, "I'm a tribe seed\n")
-	go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe").Run()
+	cmd := exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	go cmd.Run()
+
 	go func() {
 		defer wg.Done()
 		for true {
