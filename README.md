@@ -78,7 +78,7 @@ Go to kubesnap/tools:
 cd kubesnap/tools
 ```
 
-Provision kubesnap:
+Provision kubesnap (it takes approximately 35 minutes on a VM with 4 vCPUs and 15 GB of RAM in us-central1-b zone):
 ```
 ./provision-kubesnap.sh
 ```
