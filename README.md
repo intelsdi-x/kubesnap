@@ -34,27 +34,22 @@
 
   ![Alt text](docs/images/image_03.png "Selecting Compute Engine in Google Cloud Console Menu")
 
-#### d) Create an VM instance  
+#### d) Create a new VM instance  
 - create a new VM instance
   ![Alt text](docs/images/image_04.png "Creating an VM instance")  
 
-- set an unique name of a new instance
-- choose a machine with 4 vCPUs (or more) and at least 15GB RAM
+- set the instance name
+- choose a machine with at least 4 vCPUs and at least 15GB RAM
 - select Ubuntu 16.04 with standard persistent disk with at least 100GB
 
   ![Alt text](docs/images/image_05.png "Setting up a new VM")  
 
-#### e) Start GCE Virtual Machine  
-- select your VM and choose _START_ option which is available on the top of screen
-
-  ![Alt text](docs/images/image_06.png "Staring an VM instance")  
-
-#### f) Open the VM terminal by click on SSH  
+#### e) Open the VM terminal by click on SSH  
  -  click on SSH to open the VM terminal (it will open as a new window)
 
   ![Alt text](docs/images/image_07.png "Opening the terminal of Virtual Machine") 
 
-#### g) Authorize access to Google Cloud Platform  
+#### f) Authorize access to Google Cloud Platform  
 - manage credentials for the Google Cloud SD. To do that, run the following command:
   ```
   gcloud auth login
@@ -84,22 +79,12 @@ Go to kubesnap/tools:
 cd kubesnap/tools
 ```
 
-##### Building
+##### Building and starting kubesnap
 
-- Build kubesnap:
+- Provision kubesnap:
 ```
 ./provision-kubesnap.sh
 ```
-
-- Build Kubernetes:
-```
-./provision-kubesnap.sh --kubernetes build
-```
-##### Starting
-- Start Kubernetes cluster:
-```
-./provision-kubesnap.sh --kubernetes start
-```  
 
 ### 4. Contributing
 We love contributions!
@@ -112,4 +97,4 @@ And **thank you!** Your contribution, through code and participation, is incredi
 [snap](http://github.com:intelsdi-x/snap), along with this kubesnap, is an Open Source software released under the Apache 2.0 [License](LICENSE).
 
 ### 6. Acknowledgements
-* Author: [Andrzej Kuriata](https://github.com/andrzej-k/)
+* Authors: [Izabella Raulin](https://github.com/IzabellaRaulin),  [Marcin Olszewski](https://github.com/marcintao),  [Marcin Krolik](https://github.com/marcin-krolik), [Andrzej Kuriata](https://github.com/andrzej-k/)
