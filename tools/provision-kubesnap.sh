@@ -92,6 +92,7 @@ function install_golang {
 function install_docker {
         # Docker installation
         sudo apt-get update
+        echo "===> INSTALLING docker"
         sudo apt-get -y install linux-image-extra-$(uname -r)
         sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
         sudo sh -c "echo deb http://get.docker.io/ubuntu docker main\ > /etc/apt/sources.list.d/docker.list"
