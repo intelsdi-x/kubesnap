@@ -10,7 +10,7 @@ function usage {
         echo "  --snap          - 0 skips building and pushing snap image, 1 builds and pushes snap image to gcr.io"
         echo "  --heapster      - 0 skips building and pushing heapster image, 1 build and pushes heapster image to gcr.io"
         echo "  --grafana       - 0 skips building and pushing grafana image, 1 build and pushes grafana image to gcr.io"
-        echo "  --kubernetes    - "build" builds kubernetes with release-skip-tests, "start" starts kubernetes cluster"
+        echo "  --kubernetes    - 0 skips building and starting Kubernetes, 1 build and start Kubernetes, \"build\" builds Kubernetes, \"start\" starts Kubernetes cluster"
         echo "  --clone_repos   - 0 skips cloning of required github repos, 1 clones all required github repos"
         echo "  --help          - displays this help"
         echo ""
@@ -91,11 +91,13 @@ function install_golang {
 
 function install_docker {
         # Docker installation
-        sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-        echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" | sudo tee /etc/apt/sources.list.d/docker.list
         sudo apt-get update
         echo "===> INSTALLING docker"
-        sudo apt-get -y install apt-transport-https ca-certificates linux-image-extra-$(uname -r) docker-engine
+        sudo apt-get -y install linux-image-extra-$(uname -r)
+        sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
+        sudo sh -c "echo deb http://get.docker.io/ubuntu docker main\ > /etc/apt/sources.list.d/docker.list"
+        sudo apt-get update
+        sudo apt-get -y install lxc-docker
         sudo usermod -aG docker $USER
 }
 
@@ -159,7 +161,7 @@ function set_defaults {
         SNAP="1"
         HEAPSTER="1"
         GRAFANA="1"
-        KUBERNETES="0"
+        KUBERNETES="1"
 }
 
 function main {
@@ -171,16 +173,6 @@ function main {
         set_defaults
         parse_args "$@"
         get_project
-        if [ "$KUBERNETES" == "build" ];then
-                build_kubernetes $project
-                exit 0
-        fi
-        if [ "$KUBERNETES" == "start" ];then
-                source $HOME/google-cloud-sdk/path.bash.inc
-                source $HOME/google-cloud-sdk/completion.bash.inc
-                cd $HOME/kubernetes; sg docker -c "go run hack/e2e.go -v --up"
-                exit 0
-        fi
         if [ "$REPOS" == "1" ];then
                 clone_repos
         fi
@@ -202,5 +194,14 @@ function main {
         if [ "$GRAFANA" == "1" ];then
                 build_grafana_image $project
         fi
+        if [ "$KUBERNETES" == "build" ] || [ "$KUBERNETES" == "1" ] ; then
+                build_kubernetes $project
+        fi
+        if [ "$KUBERNETES" == "start" ] || [ "$KUBERNETES" == "1" ] ; then
+                source $HOME/google-cloud-sdk/path.bash.inc
+                source $HOME/google-cloud-sdk/completion.bash.inc
+                cd $HOME/kubernetes; sg docker -c "go run hack/e2e.go -v --up"
+        fi
 }
+
 main $@
