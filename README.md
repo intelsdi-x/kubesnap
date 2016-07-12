@@ -72,16 +72,13 @@ Clone kubesnap into your home directory:
 ```
 git clone https://github.com/intelsdi-x/kubesnap
 ```
-kubesnap supports automatic installation via script [provision-kubesnap.sh](https://github.com/intelsdi-x/kubesnap/blob/master/tools/provision-kubesnap.sh)
 
 Go to kubesnap/tools:
 ```
 cd kubesnap/tools
 ```
 
-##### Building and starting kubesnap
-
-- Provision kubesnap:
+Provision kubesnap:
 ```
 ./provision-kubesnap.sh
 ```
