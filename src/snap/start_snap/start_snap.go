@@ -85,7 +85,7 @@ func main() {
 
 		fmt.Fprintf(w, "Starting snapd with tribe seed: %s\n", tribeSeed)
 		w.Flush()
-		cmd := exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe", "--tribe-seed", tribeSeed)
+		cmd := exec.Command(snapd, "-l", "1", "-t", "0", "--tribe", "--tribe-seed", tribeSeed, "--tribe-addr", myPodIP)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		go cmd.Run()
@@ -94,7 +94,7 @@ func main() {
 	}
 
 	fmt.Fprintf(w, "I'm a tribe seed\n")
-	cmd := exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe")
+	cmd := exec.Command(snapd, "-l", "1", "-t", "0", "--tribe", "--tribe-addr", myPodIP)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	go cmd.Run()

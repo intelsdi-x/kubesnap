@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: snap-config
+data:
+  tribe.seed: 'k8s-01'
+  tribe.node: '3'
