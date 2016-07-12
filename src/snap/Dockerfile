@@ -2,7 +2,7 @@ FROM ubuntu
 MAINTAINER mateusz.kleina@intel.com
 
 RUN apt-get update
-RUN apt-get -y install wget curl make git vim netcat gcc mysql-client
+RUN apt-get -y install wget curl make git vim netcat gcc mysql-client || apt-get -o Acquire::http::No-Cache=true -o Acquire::BrokenProxy=true -y install wget curl make git vim netcat gcc mysql-client
 
 ENV DOCKER_BUCKET get.docker.com
 ENV DOCKER_VERSION 1.10.3
