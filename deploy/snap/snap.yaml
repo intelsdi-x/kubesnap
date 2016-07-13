@@ -3,6 +3,8 @@ kind: DaemonSet
 metadata:
   name: snap
   namespace: kube-system
+  labels:
+    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
@@ -14,12 +16,33 @@ spec:
       hostNetwork: true
       containers:
       - name: snap
-        image: 10.1.23.1:5000/snap:1
+        image: localhost:5000/snap
+        env:
+          - name: SNAP_SEED_IP
+            valueFrom:
+              configMapKeyRef:
+                name: snap-config
+                key: tribe.seed
+          - name: SNAP_TRIBE_NODES
+            valueFrom:
+              configMapKeyRef:
+                name: snap-config
+                key: tribe.nodes
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
         volumeMounts:
           - mountPath: /sys/fs/cgroup
             name: cgroup
           - mountPath: /var/run/docker.sock
             name: docker-sock
+          - mountPath: /var/lib/docker
+            name: fs-stats
+          - mountPath: /usr/local/bin/docker
+            name: docker
+          - mountPath: /proc_host
+            name: proc
         ports:
         - containerPort: 8181
           hostPort: 8181
@@ -37,3 +60,12 @@ spec:
         - name: docker-sock
           hostPath:
             path: /var/run/docker.sock
+        - name: fs-stats
+          hostPath:
+            path: /var/lib/docker
+        - name: docker
+          hostPath:
+            path: /usr/bin/docker
+        - name: proc
+          hostPath:
+            path: /proc
