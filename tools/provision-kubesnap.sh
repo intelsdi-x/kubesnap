@@ -188,6 +188,7 @@ function main {
         #       usage
         #       exit 1
         #fi
+        sudo apt-get update
         set_defaults
         parse_args "$@"
         get_project
