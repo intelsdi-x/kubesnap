@@ -195,11 +195,11 @@ func main() {
 		}
 		fmt.Fprintf(w, "Starintg snapd with tribe seed: %s\n", tribeSeed)
 		w.Flush()
-		go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe", "--tribe-seed", tribeSeed).Run()
+		go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe", "--tribe-seed", tribeSeed, "--tribe-addr", myPodIP).Run()
 		wg.Wait()
 	}
 	fmt.Fprintf(w, "I'm a tribe seed\n")
-	go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe").Run()
+	go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe", "--tribe-addr", myPodIP).Run()
 	go func() {
 		defer wg.Done()
 		for true {
