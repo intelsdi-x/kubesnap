@@ -1,0 +1,16 @@
+## Basic example showing collecting metrics from docker collector
+version: 1
+schedule:
+  type: "simple"
+  interval: "10s"
+workflow:
+  collect:
+    metrics:
+      /intel/docker/*: {}
+    publish:
+      -
+        plugin_name: "heapster"
+        config:
+          stats_span: "10m"
+          server_addr: "127.0.0.1"
+          server_port: 8777

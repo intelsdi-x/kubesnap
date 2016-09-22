@@ -1,0 +1,25 @@
+## Example showing collecting custom metrics in addition to incoming docker metrics
+version: 1
+schedule:
+  type: "simple"
+  interval: "3s"
+workflow:
+  collect:
+    metrics:
+      /intel/docker/*: {}
+      /intel/mock/*: {}
+    config:
+      /intel/mock:
+        user: "root"
+        password: "secret"
+    tags:
+      /intel/mock:
+        custom_metric_format: "float"
+    publish:
+      -
+        plugin_name: "heapster"
+        config:
+          verbose_at: "/processor/custom"
+          stats_span: "10m"
+          server_addr: "127.0.0.1"
+          server_port: 8777

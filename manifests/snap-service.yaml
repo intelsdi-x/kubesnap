@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: snap-tribe
+  namespace: kube-system
+spec:
+  ports:
+  - port: 6000
+    protocol: TCP
+    name: tribe
+  - port: 8181
+    name: api
+  - port: 8777
+    name: heapster
+  selector:
+    daemon: snapd

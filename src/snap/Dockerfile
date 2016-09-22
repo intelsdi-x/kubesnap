@@ -35,13 +35,13 @@ RUN git reset --hard 902b9aec57f72943a244a744da39ef3e145df104
 RUN make && make install
 
 # build heapster publisher
-COPY kubesnap-plugin-publisher-heapster /go/src/github.com/intelsdi-x/kubesnap-plugin-publisher-heapster
-WORKDIR /go/src/github.com/intelsdi-x/kubesnap-plugin-publisher-heapster
+COPY snap-plugin-publisher-heapster /go/src/github.com/intelsdi-x/snap-plugin-publisher-heapster
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-publisher-heapster
 RUN make
 
 # build docker collector
-COPY kubesnap-plugin-collector-docker /go/src/github.com/intelsdi-x/kubesnap-plugin-collector-docker
-WORKDIR /go/src/github.com/intelsdi-x/kubesnap-plugin-collector-docker
+COPY snap-plugin-collector-docker /go/src/github.com/intelsdi-x/snap-plugin-collector-docker
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-docker
 RUN make
 
 # create directory for snap plugins and task autoload
@@ -59,8 +59,8 @@ RUN cp -a /go/src/start_snap/start_snap /usr/local/bin/start_snap
 COPY tasks /opt/snap/tasks
 
 # Install plugins in autoload directory
-RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-publisher-heapster/build/rootfs/snap-plugin-publisher-heapster /opt/snap/plugins
-RUN cp -a /go/src/github.com/intelsdi-x/kubesnap-plugin-collector-docker/build/rootfs/snap-plugin-collector-docker /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-publisher-heapster/build/rootfs/snap-plugin-publisher-heapster /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-docker/build/linux/x86_64/snap-plugin-collector-docker /opt/snap/plugins
 RUN cp -a /go/src/github.com/intelsdi-x/snap/build/plugin/snap-publisher-file /opt/snap/plugins
 
 # start snap daemon
