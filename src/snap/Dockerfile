@@ -44,6 +44,36 @@ COPY snap-plugin-collector-docker /go/src/github.com/intelsdi-x/snap-plugin-coll
 WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-docker
 RUN make
 
+# build meminfo collector
+COPY snap-plugin-collector-meminfo /go/src/github.com/intelsdi-x/snap-plugin-collector-meminfo
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-meminfo
+RUN make
+
+# build processes collector
+COPY snap-plugin-collector-processes /go/src/github.com/intelsdi-x/snap-plugin-collector-processes
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-processes
+RUN make
+
+# build nova collector
+COPY snap-plugin-collector-nova /go/src/github.com/intelsdi-x/snap-plugin-collector-nova
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-nova
+RUN make
+
+# build keystone collector
+COPY snap-plugin-collector-keystone /go/src/github.com/intelsdi-x/snap-plugin-collector-keystone
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-keystone
+RUN make
+
+# build neutron collector
+COPY snap-plugin-collector-neutron /go/src/github.com/intelsdi-x/snap-plugin-collector-neutron
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-neutron
+RUN make
+
+# build glance collector
+COPY snap-plugin-collector-glance /go/src/github.com/intelsdi-x/snap-plugin-collector-glance
+WORKDIR /go/src/github.com/intelsdi-x/snap-plugin-collector-glance
+RUN make
+
 # create directory for snap plugins and task autoload
 RUN mkdir -p /opt/snap/plugins
 RUN mkdir -p /opt/snap/tasks
@@ -58,9 +88,18 @@ RUN cp -a /go/src/start_snap/start_snap /usr/local/bin/start_snap
 # copy task
 COPY tasks /opt/snap/tasks
 
+# copy config
+COPY config.json /opt/snap/config.json
+
 # Install plugins in autoload directory
 RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-publisher-heapster/build/rootfs/snap-plugin-publisher-heapster /opt/snap/plugins
 RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-docker/build/linux/x86_64/snap-plugin-collector-docker /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-keystone/build/linux/x86_64/snap-plugin-collector-keystone /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-glance/build/linux/x86_64/snap-plugin-collector-glance /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-neutron/build/linux/x86_64/snap-plugin-collector-neutron /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-nova/build/linux/x86_64/snap-plugin-collector-nova /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-meminfo/build/linux/x86_64/snap-plugin-collector-meminfo /opt/snap/plugins
+RUN cp -a /go/src/github.com/intelsdi-x/snap-plugin-collector-processes/build/linux/x86_64/snap-plugin-collector-processes /opt/snap/plugins
 RUN cp -a /go/src/github.com/intelsdi-x/snap/build/plugin/snap-publisher-file /opt/snap/plugins
 
 # start snap daemon
@@ -71,4 +110,5 @@ ENV PLUGINS_TO_LOAD 3
 ENV TASK_AUTOLOAD_FILE /opt/snap/tasks/heapster-docker.json
 ENV PROCFS_MOUNT /proc_host
 EXPOSE 8181 8777
-ENTRYPOINT ["/usr/local/bin/start_snap"]
+COPY ./start.sh /
+ENTRYPOINT ["/start.sh"]

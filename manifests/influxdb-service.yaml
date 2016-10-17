@@ -15,7 +15,7 @@ spec:
       port: 8086
       targetPort: 8086
   externalIPs:
-    - 10.91.96.118
+    - 100.64.32.15
   selector: 
     k8s-app: influxGrafana
 

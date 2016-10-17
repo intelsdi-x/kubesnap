@@ -16,13 +16,15 @@ spec:
       hostNetwork: true
       containers:
       - name: snap
-        image: 10.91.96.87:5000/snap2:mkuculyma
+        image: 100.64.32.16:5000/snap3
         env:
           - name: MY_POD_IP
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
         volumeMounts:
+          - mountPath: /opt/dns
+            name: resolvconf
           - mountPath: /sys/fs/cgroup
             name: cgroup
           - mountPath: /var/run/docker.sock
@@ -44,6 +46,9 @@ spec:
         securityContext:
           privileged: true
       volumes:
+        - name: resolvconf
+          configMap:
+            name: snap-resolvconf
         - name: cgroup
           hostPath:
             path: /sys/fs/cgroup

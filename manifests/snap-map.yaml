@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: snap-resolvconf
+  namespace: kube-system
+data:
+  resolv.conf: "search kube-system.svc.cluster.local default.svc.cluster.local svc.cluster.local cluster.local \nnameserver 10.2.0.10 \nnameserver 8.8.8.8"
+

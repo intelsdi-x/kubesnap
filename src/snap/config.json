@@ -1,0 +1,38 @@
+{
+    "control": {
+        "plugins": {
+            "collector": {
+                "nova-compute": {
+                    "all": {
+                        "openstack_auth_url": "http://keystone-api:5000/v2.0/",
+                        "openstack_user": "admin",
+                        "openstack_pass": "password",
+                        "openstack_tenant": "admin",
+                        "allocation_ratio_cores" : 1.5,
+                        "allocation_ratio_ram": 3,
+                        "reserved_node_cores" : 2,
+                        "reserved_node_ram_mb" : 2048
+                      }
+                },
+		"neutron": {
+        	    "all": {
+          	        "openstack_auth_url": "http://keystone-api:5000/v2.0/",
+          	        "openstack_user": "admin",
+                        "openstack_password": "password",
+                        "openstack_tenant": "admin"
+        	     }
+		},
+		"keystone": {
+        	    "all": {
+          		"admin_endpoint": "http://keystone-api:35357/v2.0/",
+       			"admin_user": "admin",
+      			"admin_password": "password",
+         		"admin_tenant": "admin"
+        	    }
+		}
+            },
+            "publisher": {},
+            "processor": {}
+        }
+    }
+}

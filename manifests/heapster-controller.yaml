@@ -20,7 +20,7 @@ spec:
         version: v1.1.0.beta2
     spec:
       containers:
-        - image: 10.91.96.87:5000/heapster2:mkuculyma
+        - image: 100.64.32.16:5000/heapster-snap
           name: heapster
           resources:
             limits:
@@ -33,7 +33,7 @@ spec:
             - /heapster
             - --source=kubernetes.snap:''
             - --sink=influxdb:http://monitoring-influxdb:8086
-        - image: 10.91.96.87:5000/heapster:mkuculyma
+        - image: 100.64.32.16:5000/heapster-snap
           name: eventer
           resources:
             limits:

@@ -36,7 +36,7 @@ spec:
           volumeMounts:
           - name: influxdb-persistent-storage
             mountPath: /data
-        - image: 10.91.96.87:5000/grafana:mkuculyma
+        - image: 100.64.32.16:5000/grafana-snap
           name: grafana
           env:
           resources:

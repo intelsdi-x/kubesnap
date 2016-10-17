@@ -31,7 +31,7 @@ import (
 )
 
 const (
-	minNodeCount = 2
+	minNodeCount = 7
 	timeout      = 5
 	interval     = 10
 )
@@ -134,7 +134,7 @@ func main() {
 	pluginsToLoad := os.Getenv("PLUGINS_TO_LOAD")
 	snapd := os.Getenv("SNAPD_BIN")
 	snapctl := os.Getenv("SNAPCTL_BIN")
-	task := os.Getenv("TASK_AUTOLOAD_FILE")
+	//task := os.Getenv("TASK_AUTOLOAD_FILE")
 	client, err := NewClient()
 	if err != nil {
 		fmt.Printf("Error creating client: %v", err)
@@ -156,8 +156,7 @@ func main() {
 
 	myPodIP := os.Getenv("MY_POD_IP")
 	agreement := "all-nodes"
-
-	fmt.Fprintf(w, "tribe seed IP: %s, my POD IP: %s, expcted number of Tribe members: %s\n", tribeSeed, myPodIP, numTribeNodes)
+	fmt.Fprintf(w, "tribe seed IP: %s, my POD IP: %s, expcted number of Tribe members: %d\n", tribeSeed, myPodIP, numTribeNodes)
 
 	plugins := Plugins{}
 	tribeNodes := Tribe{}
@@ -190,11 +189,11 @@ func main() {
 		}
 		fmt.Fprintf(w, "Starintg snapd with tribe seed: %s\n", tribeSeed)
 		w.Flush()
-		go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe", "--tribe-seed", tribeSeed, "--tribe-addr",myPodIP).Run()
+		go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--config", "/opt/snap/config.json", "--tribe", "--tribe-seed", tribeSeed, "--tribe-addr",myPodIP).Run()
 		wg.Wait()
 	}
 	fmt.Fprintf(w, "I'm a tribe seed\n")
-	go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--tribe","--tribe-addr",myPodIP).Run()
+	go exec.Command(snapd, "-l", "1", "-o", "/tmp", "-t", "0", "--config", "/opt/snap/config.json", "--tribe","--tribe-addr",myPodIP).Run()
 	go func() {
 		defer wg.Done()
 		for true {
@@ -215,7 +214,7 @@ func main() {
 				json.Unmarshal(body, &tribeNodes)
 				numNodes := numTribeNodes
 				if len(tribeNodes.Body.Members) < numNodes {
-					fmt.Fprintf(w, "Too few tribe members. Got: %v (%+v), Need: %v\n", len(tribeNodes.Body.Members), tribeNodes, numNodes)
+					fmt.Fprintf(w, "Too few tribe members. Got: %v (%+v), :Need: %v\n", len(tribeNodes.Body.Members), tribeNodes, numNodes)
 					time.Sleep(time.Second)
 					continue
 				}
@@ -266,7 +265,13 @@ func main() {
 				// account for plugins loaded on remote nodes
 				// TODO improve this
 				time.Sleep(3 * time.Second)
-				exec.Command(snapctl, "task", "create", "-t", task).Run()
+                                files, _ := ioutil.ReadDir("/opt/snap/tasks")
+                                for _, f := range files {
+                                        fmt.Fprintf(w, "Loading task %s", f.Name())
+					taskFile := fmt.Sprintf("/opt/snap/tasks/%s", f.Name())
+					exec.Command(snapctl, "task", "create", "-t", taskFile).Run()
+                                	time.Sleep(3 * time.Second)
+                                }
 				return
 			}
 			fmt.Fprintf(w, "Listing plugins not successful - waiting\n")

@@ -9,9 +9,16 @@
     "workflow": {
         "collect": {
             "metrics": {
-                "/intel/docker/*": {}
+                "/intel/docker/*": {},
             },
-            "config": {},
+           "config": {
+                "/intel/openstack/glance": {
+                    "endpoint": "http://keystone-api:5000/v2.0/",
+                    "user": "admin",
+                    "password": "password",
+                    "tenant": "admin"
+                }
+            },
          "publish":[
             {
                "plugin_name": "heapster",
