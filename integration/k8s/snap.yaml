@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet 
+metadata:
+  name: snap
+  namespace: kube-system
+  labels:
+    kubernetes.io/cluster-service: "true"
+spec:
+  template:
+    metadata:
+      name: snap
+      labels:
+        daemon: snapteld
+    spec:
+      hostNetwork: true
+      containers:
+      - name: snap
+        image: mkuculyma/test:1 
+        volumeMounts:
+          - mountPath: /sys/fs/cgroup
+            name: cgroup
+          - mountPath: /var/run/docker.sock
+            name: docker-sock
+          - mountPath: /var/lib/docker
+            name: fs-stats
+          - mountPath: /usr/local/bin/docker
+            name: docker
+          - mountPath: /proc_host
+            name: proc
+        ports:
+        - containerPort: 8181
+          hostPort: 8181
+          name: snap-api
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+      volumes:
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: fs-stats
+          hostPath:
+            path: /var/lib/docker
+        - name: docker
+          hostPath:
+            path: /usr/bin/docker
+        - name: proc
+          hostPath:
+            path: /proc
