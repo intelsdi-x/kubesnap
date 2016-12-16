@@ -12,10 +12,15 @@ spec:
       labels:
         daemon: snapteld
     spec:
+      # this option is required for tribe mode
       hostNetwork: true
       containers:
       - name: snap
-        image: mkuculyma/test:1 
+        image: intelsdi/snap
+        env:
+        - name: PROCFS_MOUNT
+          value: "/proc_host"
+        # mapping of dirs below is required for docker plugin 
         volumeMounts:
           - mountPath: /sys/fs/cgroup
             name: cgroup
@@ -31,7 +36,11 @@ spec:
         - containerPort: 8181
           hostPort: 8181
           name: snap-api
+        - containerPort: 8777
+          hostPort: 8777
+          name: heapster
         imagePullPolicy: Always
+        # privileged mode is required to access mounted dirs 
         securityContext:
           privileged: true
       volumes:

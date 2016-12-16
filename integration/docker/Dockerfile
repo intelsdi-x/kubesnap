@@ -16,17 +16,14 @@ RUN curl -sfL "$SNAP_DOWNLOAD_URL" -o snap-telemetry.tar.gz \
     && cp snaptel /usr/local/bin
 
 ENV DOCKER_BUCKET get.docker.com
-ENV DOCKER_VERSION 1.10.3
-ENV DOCKER_SHA256 d0df512afa109006a450f41873634951e19ddabf8c7bd419caeb5a526032d86d
+ENV DOCKER_VERSION 1.12.4
+ENV DOCKER_SHA256 f7cb7bb55d6ceba3ba3d24d62027e84799763b4c41b0bda5d8d5b9ba31ed0f2f 
 
-RUN curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION" -o /usr/local/bin/docker \
+RUN curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION.tgz" -o /usr/local/bin/docker \
 	&& echo "${DOCKER_SHA256}  /usr/local/bin/docker" | sha256sum -c - \
 	&& chmod +x /usr/local/bin/docker
 
-EXPOSE 8181
-
-ENV SNAP_LOG_LEVEL=1
-ENV SNAP_TRUST_LEVEL=0
+EXPOSE 8181 8777
 
 COPY snapteld.conf /etc/snap/snapteld.conf
-CMD /usr/local/sbin/snapteld -l ${SNAP_LOG_LEVEL} -t ${SNAP_TRUST_LEVEL} -o ''
+CMD /usr/local/sbin/snapteld 
