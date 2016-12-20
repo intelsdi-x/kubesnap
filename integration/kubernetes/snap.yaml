@@ -12,50 +12,19 @@ spec:
       labels:
         daemon: snapteld
     spec:
-      # this option is required for tribe mode
-      hostNetwork: true
       containers:
       - name: snap
-        image: intelsdi/snap
-        env:
-        - name: PROCFS_MOUNT
-          value: "/proc_host"
-        # mapping of dirs below is required for docker plugin 
+        image: intelsdi/snap 
+        # mapping of /proc is required for CPU plugin
         volumeMounts:
-          - mountPath: /sys/fs/cgroup
-            name: cgroup
-          - mountPath: /var/run/docker.sock
-            name: docker-sock
-          - mountPath: /var/lib/docker
-            name: fs-stats
-          - mountPath: /usr/local/bin/docker
-            name: docker
           - mountPath: /proc_host
             name: proc
         ports:
         - containerPort: 8181
           hostPort: 8181
           name: snap-api
-        - containerPort: 8777
-          hostPort: 8777
-          name: heapster
         imagePullPolicy: Always
-        # privileged mode is required to access mounted dirs 
-        securityContext:
-          privileged: true
       volumes:
-        - name: cgroup
-          hostPath:
-            path: /sys/fs/cgroup
-        - name: docker-sock
-          hostPath:
-            path: /var/run/docker.sock
-        - name: fs-stats
-          hostPath:
-            path: /var/lib/docker
-        - name: docker
-          hostPath:
-            path: /usr/bin/docker
         - name: proc
           hostPath:
             path: /proc

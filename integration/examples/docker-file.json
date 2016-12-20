@@ -7,7 +7,7 @@
     "workflow": {
         "collect": {
             "metrics": {
-                "/intel/docker/*":{}
+                "/intel/docker/*": {}
             },
             "publish": [
                 {

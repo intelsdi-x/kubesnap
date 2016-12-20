@@ -23,6 +23,8 @@ RUN curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSI
 	&& echo "${DOCKER_SHA256}  /usr/local/bin/docker" | sha256sum -c - \
 	&& chmod +x /usr/local/bin/docker
 
+RUN mkdir /var/log/snap
+
 EXPOSE 8181 8777
 
 COPY snapteld.conf /etc/snap/snapteld.conf
