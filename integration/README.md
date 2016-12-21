@@ -13,8 +13,8 @@ Snap can be deployed to collect metrics in various environments including Docker
 To start examples below you need to have Kubernetes cluster set up. If you do not have Kubernetes cluster you can go to GCE section [Snap on Kubernetes with Heapster publisher](#3-running-snap-with-heapster-publisher) to start new Kubernetes cluster on GCE with Snap as telemetry solution.
 First step is to download Snap repo. All of the needed files are in the `snap/integration` directory.
 ```sh
-$ git clone https://github.com/intelsdi-x/snap
-$ cd snap/integration
+$ git clone https://github.com/intelsdi-x/snap-integration-kubernetes/
+$ cd ./snap-integration-kubernetes
 ```
 
 ### 2. Running Snap in Docker container
@@ -29,7 +29,7 @@ $ docker run -d --name snap -p 8181:8181 intelsdi/snap
 #### b) Running Snap in a container using your own image
 However, if you prefer building Snap image on your own, you can use Dockerfile located in the directory `snap/integration/docker`. To build Snap image from Dockerfile, you run the command:
 ```sh
-$ docker build -t <snap-image-name> snap/integration/docker
+$ docker build -t <snap-image-name> snap-integration-kubernetes/src/snap
 ```
 and when the image is ready, you may start Snap with your own image:
 ```sh
@@ -84,8 +84,8 @@ $ snaptel plugin list
 ``` 
 will print information about the two loaded plugins. To start the collection of metrics you can create task.
 ```sh
-$ curl -sO https://raw.githubusercontent.com/intelsdi-x/snap/integration/examples/cpu-file.json
-$ snaptel task create -t examples/cpu-file.json
+$ curl -sO https://raw.githubusercontent.com/intelsdi-x/snap-integration-kubernetes/examples/tasks/cpu-file.json
+$ snaptel task create -t snap-integration-kubernetes/examples/tasks/cpu-file.json
 ```
 Command:
 ```sh
@@ -102,7 +102,7 @@ More information and examples of loading plugins is described in section [Custom
 If you already have Kubernetes setup you can follow the instructions described in sections a) and b). However, if you do not have Kubernetes and you wish to try Snap out on Google Compute Engine you can go to section c).
 
 #### a) Running Snap in Kubernetes - CPU collector plugin example 
-To run Snap in Kubernetes pods create daemonset from manifest file `snap/integration/kubernetes/snap.yaml` presented below.
+To run Snap in Kubernetes pods create daemonset from manifest file `snap-integration-kubernetes/run/kubernetes/snap/snap.yaml` presented below.
 ```sh
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -140,7 +140,7 @@ The manifest contains parameters `volumeMounts` and `volume`. Those fields are r
 
 Let's create Snap daemonset:
 ```sh
-$ kubectl create -f snap/integration/kubernetes/snap.yaml
+$ kubectl create -f snap-integration-kubernetes/run/kubernetes/snap/snap.yaml
 ```
 And verify that pods have been created:
 ```sh
@@ -170,7 +170,7 @@ $ snaptel plugin list
 ``` 
 will print information about two loaded plugins. To start the collection of metrics you can create task.
 ```sh
-$ curl -sO https://raw.githubusercontent.com/intelsdi-x/snap/integration/examples/cpu-file.json
+$ curl -sO https://raw.githubusercontent.com/intelsdi-x/snap-integration-kubernetes/examples/tasks/cpu-file.json
 $ snaptel task create -t ./cpu-file.json
 ``` 
 Command:
@@ -190,18 +190,18 @@ There is also a possibility to publish metrics gathered by Snap collector to cus
 - Snap Heapster publisher (https://github.com/intelsdi-x/snap-plugin-publisher-heapster)
 
 ##### Running customized Heapster with Snap source
-To run the customized Heapster image you need to create Heapster service and deployment from manifest files `snap/integration/kubernetes/heapster/heapster-service.yaml` and `snap/integration/kubernetes/heapster/heapster-controller.yaml`.
+To run the customized Heapster image you need to create Heapster service and deployment from manifest files `snap-integration-kubernetes/run/kubernetes/heapster/heapster-service.yaml` and `snap-integration-kubernetes/run/kubernetes/heapster/heapster-controller.yaml`.
 ```sh
-$ kubectl create -f snap/integration/kubernetes/heapster/heapster-service.yaml
-$ kubectl create -f snap/integration/kubernetes/heapster/heapster-controller.yaml
+$ kubectl create -f snap-integration-kubernetes/run/kubernetes/heapster/heapster-service.yaml
+$ kubectl create -f snap-integration-kubernetes/run/kubernetes/heapster/heapster-controller.yaml
 ```
 
 ##### Snap Docker collector
 Kubernetes manifest has to be adjusted to use with Snap Docker collector plugin (https://github.com/intelsdi-x/snap-plugin-collector-docker). To start Snap daemonset adjusted to use with Snap Docker collector plugin you simply run the command:
 ```sh
-$ kubectl create -f snap/integration/kubernetes/snap-docker.yaml
+$ kubectl create -f snap-integration-kubernetes/run/kubernetes/snap/snap-docker.yaml
 ```
-The manifest `snap/integration/kubernetes/snap-docker.yaml` contains fields `volumeMounts` and `volume` that allow to map files inside of the pods. They are required because Docker collector needs access to files on the host:
+The manifest `snap-integration-kubernetes/run/kubernetes/snap/snap-docker.yaml` contains fields `volumeMounts` and `volume` that allow to map files inside of the pods. They are required because Docker collector needs access to files on the host:
 - `/var/run/docker.sock`
 - `/proc`
 - `/usr/bin/docker`
@@ -228,7 +228,7 @@ spec:
       hostNetwork: true
       containers:
       - name: snap
-        image: mkuculyma/test:1
+        image: intelsdi/snap
         # mapping of dirs below is required for docker plugin
         volumeMounts:
           - mountPath: /sys/fs/cgroup
@@ -296,7 +296,7 @@ $ snaptel plugin list
 ``` 
 will provide information whether plugins have been loaded correctly. After that you can download an exemplary task manifest and create it:
 ```sh
-$ curl -sO https://raw.githubusercontent.com/intelsdi-x/snap/integration/integration/docker-heapster.json
+$ curl -sO https://raw.githubusercontent.com/intelsdi-x/snap-integration-kubernetes/examples/tasks/docker-heapster.json
 $ snaptel task create -t ./docker-heapster.json
 ``` 
 
@@ -422,7 +422,7 @@ $ snaptel plugin list
 will print information about the two loaded plugins. To start the collection of metrics you can create task.
 ```sh
 $ curl -sO https://raw.githubusercontent.com/intelsdi-x/snap-plugin-collector-docker/master/examples/docker-file.json
-$ snaptel task create -t ./examples/docker-file.json
+$ snaptel task create -t ./docker-file.json
 ``` 
 Command:
 ```sh
@@ -435,7 +435,7 @@ This way you may download and load almost any Snap plugin inside the Docker cont
 #### b) Configuration of Kubernetes pod
 To run Docker collector in Kubernetes pod we need to fullfill the same requirements. We have to mount directories `/var/run/docker.sock`, `/proc`, `/usr/bin/docker`, `/var/lib/docker` and `/sys/fs/cgroup` file inside of the pod and export `PROCFS_MOUNT` variable. In Kubernetes this adjustment needs to be added in the manifest file.
 
-Mapping of the files is done with `volumeMounts` and `volume` parameters as shown below in the `snap/integration/kubernetes/snap-docker.yaml`. 
+Mapping of the files is done with `volumeMounts` and `volume` parameters as shown below in the `snap-integration-kubernetes/run/kubernetes/snap/snap-docker.yaml`. 
 ```sh
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -455,7 +455,7 @@ spec:
       hostNetwork: true
       containers:
       - name: snap
-        image: mkuculyma/test:1
+        image: intelsdi/snap
         # mapping of dirs below is required for docker plugin
         volumeMounts:
           - mountPath: /sys/fs/cgroup
@@ -502,7 +502,7 @@ More information about mounting of volumes can be found in Kubernetes documentat
 
 In order to run Snap with Docker collector you have to create daemonset from `snap-docker.yaml` file.
 ```sh
-$ kubectl create -f snap/integration/kubernetes/snap-docker.yaml
+$ kubectl create -f snap-integration-kubernetes/run/kubernetes/snap/snap-docker.yaml
 ```
 Verify that pods have been created. 
 ```sh
@@ -519,7 +519,7 @@ $ curl -fsL "https://github.com/intelsdi-x/snap-plugin-publisher-file/releases/d
 $ snaptel plugin load snap-plugin-collector-docker
 $ snaptel plugin load snap-plugin-publisher-file
 $ curl -sO "curl -sO "https://raw.githubusercontent.com/intelsdi-x/snap-plugin-collector-docker/master/examples/tasks/docker-file.json"
-$ snaptel task create -t ./examples/docker-file.json
+$ snaptel task create -t ./docker-file.json
 ```
 Command:
 ```sh
@@ -553,7 +553,7 @@ spec:
       hostNetwork: true
       containers:
       - name: snap
-        image: mkuculyma/test:1
+        image: intelsdi/snap
         command:
         - sleep
         - inf
@@ -603,7 +603,7 @@ spec:
 ```
 Then we create daemonset and list Snap pods.
 ```sh
-kubectl create -f snap/integration/kubernetes/snap-docker.yaml
+kubectl create -f snap-integration-kubernetes/run/kubernetes/snap/snap-docker.yaml
 kubectl get pods --all-namespaces -o wide
 ```
 The output should be similar to this:
