@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet 
+metadata:
+  name: snap
+  namespace: kube-system
+  labels:
+    kubernetes.io/cluster-service: "true"
+spec:
+  template:
+    metadata:
+      name: snap
+      labels:
+        daemon: snapteld
+    spec:
+      containers:
+      - name: snap
+        image: intelsdi/snap 
+        # mapping of /proc is required for CPU plugin
+        volumeMounts:
+          - mountPath: /proc_host
+            name: proc
+        ports:
+        - containerPort: 8181
+          hostPort: 8181
+          name: snap-api
+        imagePullPolicy: Always
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
