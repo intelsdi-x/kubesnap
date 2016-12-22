@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "10s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+                "/intel/docker/*": {}
+            },
+            "publish": [
+                {
+                    "plugin_name": "file",                    
+                    "config": {
+                        "file": "/tmp/snap-docker-file.log"
+                    }
+                }
+            ]
+        }
+    }
+}
