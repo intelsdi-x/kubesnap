@@ -24,6 +24,7 @@ RUN curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSI
 	&& chmod +x /usr/local/bin/docker
 
 RUN mkdir /var/log/snap
+RUN mkdir /opt/snap/autoload
 
 EXPOSE 8181 8777
 
