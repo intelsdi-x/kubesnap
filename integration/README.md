@@ -6,7 +6,7 @@ Snap can be deployed to collect metrics in various environments including Docker
 3. [Running Snap in Kubernetes](#3-running-snap-in-kubernetes)
     * [Snap on Kubernetes with Heapster publisher](#3-running-snap-with-heapster-publisher)
     * [Running Snap example on GCE](#3-running-snap-example-on-gce)
-4. [Customization and Configuration](#4-cutomization-and-configuration)
+4. [Customization and Configuration](#4-customization-and-configuration)
 5. [Snap in tribe mode](#5-snap-in-tribe-mode)
 
 ### 1. Getting started
@@ -388,6 +388,17 @@ All of the plugins requirements can be found in their documentation. The documen
 
 This means that the original host files have to be available inside of the container. Running this plugin inside the container requires mapping of those files inside of the container. What is more, Docker collector plugin requires enviroment variable `PROCFS_MOUNT` to be set. It should point to the directory inside the container where original host directorry `/proc` is mounted. This has to be done in both cases: Docker container and Kubernetes pod.
 
+##### Reconfiguration
+
+The default Snap images are using [autoload feature](https://github.com/intelsdi-x/snap/blob/master/docs/SNAPTELD_CONFIGURATION.md#restarting-snapteld-to-pick-up-configuration-changes) to simplify re-configuration of running Snap instance. The default autoload directory is `/opt/snap/autoload`, and can be chaged in `snapteld.conf` file - please refer to Snap [configuration documentation](https://github.com/intelsdi-x/snap/blob/master/docs/SNAPTELD_CONFIGURATION.md) for details. It is recommended to store plugins and tasks in autoload directory, so that plugins are automatically loaded, and tasks are automatically started, after snapteld restart.
+
+To change configuration of running Snap follow this steps (inside Snap container).
+- edit config file `/etc/snap/snapteld.conf`
+- restart snapteld:
+```bash
+$ kill -HUP `pidof snapteld`
+```
+
 #### a) Configuration of Docker container
 In a Docker container mapping of the files is done with the addition of `-v` flag when running the container. 
 ```sh
@@ -697,8 +708,4 @@ will print output:
 Name 		 Number of Members 	 plugins 	 tasks
 all-nodes 	 4 			         2   		 1
 ```
-
-
-
-
 
