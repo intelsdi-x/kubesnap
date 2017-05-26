@@ -1,4 +1,4 @@
-#Status
+# Status
 
 This repository is no longer being actively maintained by Intel. Work has instead shifted to the [snap-integration-kubernetes](https://github.com/intelsdi-x/snap-integration-kubernetes) repository.
 
